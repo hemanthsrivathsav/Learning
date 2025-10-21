@@ -1,0 +1,16 @@
+id,dashboard_col,source_col,dashboard_val,source_val,score,tag
+L1,Att1,DBR_Att3,Apple ,Apple ,0.99,direct
+L10,Att1,DBR_Att3,Pineapple ,Pineapple ,0.99,direct
+L11,Att1,DBR_Att3,Grapes,Grapes,0.99,direct
+L12,Att1,DBR_Att3,Banana,Banana,0.99,direct
+L13,Att1,DBR_Att3,Pear,Pear,0.99,direct
+L14,Att1,DBR_Att3,Pear,Pear,0.99,direct
+L15,Att1,DBR_Att3,Lemon,Lemon,0.99,direct
+L2,Att1,DBR_Att3,Banana,Banana,0.99,direct
+L3,Att1,DBR_Att3,Banana,Banana,0.99,direct
+L4,Att1,DBR_Att3,Grapes,Grapes,0.99,direct
+L5,Att1,DBR_Att3,Apple ,Apple ,0.99,direct
+L6,Att1,DBR_Att3,Apple ,Apple ,0.99,direct
+L7,Att1,DBR_Att3,Orange,Orange,0.99,direct
+L8,Att1,DBR_Att3,Orange,Orange,0.99,direct
+L9,Att1,DBR_Att3,Apple ,Apple ,0.99,direct

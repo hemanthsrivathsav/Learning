@@ -1,0 +1,5 @@
+
+python tools/threshold_sweep.py --out-dir ./out --module-root . --save-plots
+
+
+python tools/threshold_sweep.py --out-dir ./out --module-root . --save-plots --no-show

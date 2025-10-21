@@ -1,0 +1,2 @@
+dashboard_col,source_col,hits,total_pairs,hit_rate,avg_score,max_score,weighted_score,score_pct,direct_hits,list_hits,listlike_hits,bm25_hits,similarity_hits,suggestion
+Att1,DBR_Att3,15,15,1.0,0.9900000000000001,0.99,14.850000000000001,99.00000000000001,15,0,0,0,0,exact/very likely (strong coverage)

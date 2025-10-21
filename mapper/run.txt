@@ -1,0 +1,4 @@
+python -m mapper.main --source samp_test_src.xlsx --dashboard samp_test_rep.xlsx --id-source "Lifecycle" --id-dash "Lifecycle" --out-dir ./out --n-jobs 6 --audit
+
+# Can also adjust min-ratio while run  
+# --min-ratio 0.70 

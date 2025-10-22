@@ -249,55 +249,65 @@ def compute_similarity(a: str, b: str, tfidf_vec: TfidfVectorizer) -> float:
 
 
 # ---------- Fast-path dispatcher ----------
-def compare_elements(dash_val: str, source_val: str, tfidf_vec: TfidfVectorizer, bm25_sc_stats: Optional[Dict]) -> Tuple[float, str]:
+def compare_elements(dash_val: str, source_val: str, tfidf_vec: TfidfVectorizer, bm25_sc_stats: Optional[dict]) -> Tuple[float, str]:
     """
-    Returns (score, tag) with early exits:
-      'direct' > 'list' > 'listlike' > 'bm25' > 'similarity'
+    1) Direct string == string                 -> 0.99, 'direct'
+    2) Wrapped list membership                 -> 0.965, 'list'
+    2.5) Delimited whole-item membership       -> 0.94, 'listlike'
+    3) BM25 fallback (length & IDF normalized) -> <= ~0.5, 'bm25'
+    4) Hybrid similarity (TF-IDF + fuzzy)      -> 'similarity'
+    Returns (score, tag) choosing the stronger of BM25 vs similarity (no early return).
     """
     d_norm = normalize_text(dash_val)
     s_norm = normalize_text(source_val)
     if not d_norm or not s_norm:
         return 0.0, "none"
 
+    # detect container once
     src_type = source_container_type(source_val)
+    penalty = CONTAINER_PENALTY.get(src_type, 1.0)
 
-    # 1) direct
+    # ---- Step 1: direct equality on single source value
     if src_type == "single" and d_norm == s_norm:
         return DIRECT_MATCH_SCORE, "direct"
 
-    # 2) wrapped list
+    # ---- Step 2: wrapped list membership
     if src_type == "wrapped_list":
-        elems = wrapped_list_elements(source_val)
+        elems = wrapped_list_elements(source_val)  # normalized elements
         if d_norm in elems:
             return WRAPPED_LIST_MATCH_SCORE, "list"
 
-    # 2.5) delimited whole-item membership
+    # ---- Step 2.5: delimited whole-item membership (unwrapped comma/pipe/semicolon/slash lists)
     if src_type == "delimited_list":
         token = re.escape(d_norm)
         pattern = rf"(?:^|[,\|;/])\s*{token}\s*(?=[,\|;/]|$)"
         if re.search(pattern, s_norm):
             return LISTLIKE_DELIMITED_MATCH_SCORE, "listlike"
 
-    # 3) BM25 fallback
+    # ---- Step 3: BM25 (compute but DO NOT early-return)
+    bm25_final = 0.0
     if bm25_sc_stats is not None:
         q_toks = tokenize(d_norm)
         d_toks = tokenize(s_norm)
         bm25_raw = bm25_score(q_toks, d_toks, bm25_sc_stats["idf"], bm25_sc_stats["avgdl"])
-        bm25_norm = squash_bm25(bm25_raw)  # ~0..0.5
-        factor = CONTAINER_PENALTY.get(src_type, 1.0)
-        bm25_final = bm25_norm * factor
-        if bm25_final >= 0.01:
-            return bm25_final, "bm25"
+        bm25_norm = squash_bm25(bm25_raw)      # ~0..~0.5
+        bm25_final = bm25_norm * penalty       # apply container penalty
 
-    # 4) similarity fallback
+    # ---- Step 4: Hybrid similarity (always compute)
     d_elems = split_listy(dash_val) or [d_norm]
     s_elems = split_listy(source_val) or [s_norm]
-    best = 0.0
+    sim_best = 0.0
     for d in d_elems:
         for s in s_elems:
-            best = max(best, compute_similarity(d, s, tfidf_vec))
-    factor = CONTAINER_PENALTY.get(src_type, 1.0)
-    return best * factor, "similarity"
+            sim_best = max(sim_best, compute_similarity(d, s, tfidf_vec))
+    sim_final = sim_best * penalty             # apply same penalty once
+
+    # ---- Choose the stronger signal
+    if bm25_final >= sim_final:
+        return bm25_final, "bm25"
+    else:
+        return sim_final, "similarity"
+
 
 # ---------- Vectorizer factory ----------
 def make_tfidf_vectorizer():

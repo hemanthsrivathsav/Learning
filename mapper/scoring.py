@@ -20,8 +20,7 @@ from .config import (
     DIRECT_MATCH_SCORE, WRAPPED_LIST_MATCH_SCORE, LISTLIKE_DELIMITED_MATCH_SCORE,
     CONTAINER_PENALTY, TAG_THRESHOLDS,
     W_FP, W_FR, W_LEV, W_TFIDF,
-    TFIDF_ANALYZER, TFIDF_NGRAM_RANGE,
-    BM25_SQUASH_SCALE,
+    TFIDF_ANALYZER, TFIDF_NGRAM_RANGE
 )
 
 
@@ -123,50 +122,6 @@ def source_container_type(raw: object) -> str:
         return "delimited_list"
     return "single"
 
-# ---------- BM25 ----------
-def build_bm25_stats_for_source(src_df) -> Dict[str, Dict]:
-    stats = {}
-    for col in src_df.columns:
-        vals = src_df[col].fillna("").astype(str).tolist()
-        N = len(vals) if len(vals) > 0 else 1
-        dfs = {}
-        doc_lens = []
-        tokenized = []
-        for v in vals:
-            toks = tokenize(v)
-            tokenized.append(set(toks))
-            doc_lens.append(len(toks))
-        for toks in tokenized:
-            for t in toks:
-                dfs[t] = dfs.get(t, 0) + 1
-        idf = {t: math.log((N - df + 0.5) / (df + 0.5) + 1e-12) for t, df in dfs.items()}
-        avgdl = (sum(doc_lens) / N) if N > 0 else 1.0
-        stats[col] = {"N": N, "avgdl": float(avgdl), "idf": idf}
-    return stats
-
-def bm25_score(query_tokens: List[str], doc_tokens: List[str], idf_map: Dict[str, float], avgdl: float, k1: float = 1.2, b: float = 0.75) -> float:
-    if not query_tokens or not doc_tokens:
-        return 0.0
-    dl = len(doc_tokens)
-    if dl == 0:
-        return 0.0
-    tf = {}
-    for t in doc_tokens:
-        tf[t] = tf.get(t, 0) + 1
-    score = 0.0
-    for q in query_tokens:
-        idf = idf_map.get(q, 0.0)
-        f = tf.get(q, 0)
-        if f == 0 or idf <= 0.0:
-            continue
-        denom = f + k1 * (1 - b + b * (dl / avgdl))
-        score += idf * ((f * (k1 + 1)) / denom)
-    return score
-
-def squash_bm25(raw_score: float, scale: float = BM25_SQUASH_SCALE) -> float:
-    x = raw_score / max(1e-6, scale)
-    return 1.0 / (1.0 + math.exp(-x)) - 0.5  # ~ (0..0.5)
-
 
 # ---------- Fuzzy + TF-IDF ----------
 def tfidf_cosine(a: str, b: str, tfidf_vec: TfidfVectorizer) -> float:
@@ -249,14 +204,13 @@ def compute_similarity(a: str, b: str, tfidf_vec: TfidfVectorizer) -> float:
 
 
 # ---------- Fast-path dispatcher ----------
-def compare_elements(dash_val: str, source_val: str, tfidf_vec: TfidfVectorizer, bm25_sc_stats: Optional[dict]) -> Tuple[float, str]:
+def compare_elements(dash_val: str, source_val: str, tfidf_vec: TfidfVectorizer) -> Tuple[float, str]:
     """
     1) Direct string == string                 -> 0.99, 'direct'
     2) Wrapped list membership                 -> 0.965, 'list'
     2.5) Delimited whole-item membership       -> 0.94, 'listlike'
-    3) BM25 fallback (length & IDF normalized) -> <= ~0.5, 'bm25'
     4) Hybrid similarity (TF-IDF + fuzzy)      -> 'similarity'
-    Returns (score, tag) choosing the stronger of BM25 vs similarity (no early return).
+    Returns (score, tag) choosing the stronger of similarity (no early return).
     """
     d_norm = normalize_text(dash_val)
     s_norm = normalize_text(source_val)
@@ -284,16 +238,8 @@ def compare_elements(dash_val: str, source_val: str, tfidf_vec: TfidfVectorizer,
         if re.search(pattern, s_norm):
             return LISTLIKE_DELIMITED_MATCH_SCORE, "listlike"
 
-    # ---- Step 3: BM25 (compute but DO NOT early-return)
-    bm25_final = 0.0
-    if bm25_sc_stats is not None:
-        q_toks = tokenize(d_norm)
-        d_toks = tokenize(s_norm)
-        bm25_raw = bm25_score(q_toks, d_toks, bm25_sc_stats["idf"], bm25_sc_stats["avgdl"])
-        bm25_norm = squash_bm25(bm25_raw)      # ~0..~0.5
-        bm25_final = bm25_norm * penalty       # apply container penalty
 
-    # ---- Step 4: Hybrid similarity (always compute)
+    # ---- Step 3: Hybrid similarity (always compute)
     d_elems = split_listy(dash_val) or [d_norm]
     s_elems = split_listy(source_val) or [s_norm]
     sim_best = 0.0
@@ -302,11 +248,7 @@ def compare_elements(dash_val: str, source_val: str, tfidf_vec: TfidfVectorizer,
             sim_best = max(sim_best, compute_similarity(d, s, tfidf_vec))
     sim_final = sim_best * penalty             # apply same penalty once
 
-    # ---- Choose the stronger signal
-    if bm25_final >= sim_final:
-        return bm25_final, "bm25"
-    else:
-        return sim_final, "similarity"
+    return sim_final, "similarity"
 
 
 # ---------- Vectorizer factory ----------

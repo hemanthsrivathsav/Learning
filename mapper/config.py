@@ -21,7 +21,7 @@ DIRECT_MATCH_SCORE              = 0.99   # pure “single == single”
 WRAPPED_LIST_MATCH_SCORE        = 0.94  # member of [A,B] / {A,B} / (A,B)
 LISTLIKE_DELIMITED_MATCH_SCORE  = 0.90   # member of unwrapped “A, B, C”
 
-# --- Container penalty applied to BM25/similarity fallback
+# --- Container penalty applied to similarity fallback
 CONTAINER_PENALTY = {
     "single":         1.00,
     "wrapped_list":   0.94,
@@ -35,7 +35,6 @@ TAG_THRESHOLDS = {
     "direct":     0.70,  # will always pass with DIRECT_MATCH_SCORE
     "list":       0.70,
     "listlike":   0.70,
-    "bm25":       0.35,  # looser to admit sentence-level matches
     "similarity": 0.45,
     "none":       1.00,
 }
@@ -53,8 +52,6 @@ W_TFIDF= 0.30
 TFIDF_ANALYZER     = "char"
 TFIDF_NGRAM_RANGE  = (3, 5)
 
-# --- BM25 squashing strength (bigger => smaller normalized scores)
-BM25_SQUASH_SCALE = 2.0
 
 # --- Suggestion labels (for best mapping per dashboard col)
 HIGH_RATIO = 0.85

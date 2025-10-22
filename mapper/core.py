@@ -21,7 +21,7 @@ from .config import (
 )
 from .scoring import (
     normalize_text, make_tfidf_vectorizer, compare_elements,
-    split_listy, build_bm25_stats_for_source
+    split_listy
 )
 
 # --------- helpers ----------
@@ -68,8 +68,6 @@ def map_columns(
     all_values = pd.concat([src, dst], axis=1).replace(np.nan, "", regex=False).values.flatten().tolist()
     tfidf_vec = make_tfidf_vectorizer().fit([normalize_text(v) for v in all_values if v])
 
-    # BM25 stats once (per source column)
-    bm25_stats = build_bm25_stats_for_source(src)
 
     dash_cols = list(dst.columns)
     src_cols  = list(src.columns)
@@ -85,9 +83,8 @@ def map_columns(
         hits = 0
         total_pairs = 0
         kept_scores = []
-        direct_hits = list_hits = listlike_hits = bm25_hits = similarity_hits = 0
+        direct_hits = list_hits = listlike_hits = similarity_hits = 0
 
-        stats_sc = bm25_stats.get(sc, None)
 
         for rid in common_ids:
             dv = dst.at[rid, dc]
@@ -96,7 +93,7 @@ def map_columns(
                 continue
             total_pairs += 1
 
-            score, tag = compare_elements(dv, sv, tfidf_vec, stats_sc)
+            score, tag = compare_elements(dv, sv, tfidf_vec)
             # per-tag threshold
             tag_thresh = threshold_for(tag)
             if score >= tag_thresh:
@@ -105,7 +102,6 @@ def map_columns(
                 if tag == "direct":     direct_hits += 1
                 elif tag == "list":     list_hits += 1
                 elif tag == "listlike": listlike_hits += 1
-                elif tag == "bm25":     bm25_hits += 1
                 elif tag == "similarity": similarity_hits += 1
 
         if total_pairs == 0 or hits == 0:
@@ -130,7 +126,6 @@ def map_columns(
             direct_hits=direct_hits,
             list_hits=list_hits,
             listlike_hits=listlike_hits,
-            bm25_hits=bm25_hits,
             similarity_hits=similarity_hits
         )
 
@@ -200,19 +195,17 @@ def per_cell_audit(
         return pd.DataFrame()
 
     all_values = pd.concat([src, dst], axis=1).replace(np.nan, "", regex=False).values.flatten().tolist()
-    from .scoring import make_tfidf_vectorizer, compare_elements, build_bm25_stats_for_source, normalize_text
+    from .scoring import make_tfidf_vectorizer, compare_elements, normalize_text
     tfidf_vec = make_tfidf_vectorizer().fit([normalize_text(v) for v in all_values if v])
-    bm25_stats = build_bm25_stats_for_source(src)
 
     rows = []
     for dc, sc in pairs:
-        stats_sc = bm25_stats.get(sc, None)
         for rid in common_ids:
             dv = dst.at[rid, dc]
             sv = src.at[rid, sc]
             if pd.isna(dv) or pd.isna(sv):
                 continue
-            score, tag = compare_elements(dv, sv, tfidf_vec, stats_sc)
+            score, tag = compare_elements(dv, sv, tfidf_vec)
             rows.append(dict(
                 id=rid,
                 dashboard_col=dc,

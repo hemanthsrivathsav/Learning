@@ -20,14 +20,14 @@ def analyze_threshold_sensitivity(df_all_candidates: pd.DataFrame,
     Parameters
     ----------
     df_all_candidates : DataFrame with columns:
-        ['direct_hits','list_hits','listlike_hits','bm25_hits','similarity_hits']
-    tag_thresholds : dict, e.g. {"direct":0.70,"list":0.70,"listlike":0.70,"bm25":0.35,"similarity":0.60}
+        ['direct_hits','list_hits','listlike_hits','similarity_hits']
+    tag_thresholds : dict, e.g. {"direct":0.70,"list":0.70,"listlike":0.70,"similarity":0.60}
 
     Returns
     -------
     DataFrame with columns: ['Tag','Total_Hits','Threshold','Relative_%']
     """
-    tag_cols = ["direct_hits", "list_hits", "listlike_hits", "bm25_hits", "similarity_hits"]
+    tag_cols = ["direct_hits", "list_hits", "listlike_hits", "similarity_hits"]
     # Guard for missing columns (older runs)
     tag_cols = [c for c in tag_cols if c in df_all_candidates.columns]
     if not tag_cols:
@@ -66,11 +66,11 @@ def default_sweep_grid(base_thresholds: Dict[str, float]) -> Dict[str, List[floa
     """
     Build sensible sweep ranges around your current thresholds.
     - direct/list/listlike are already very high-confidence → narrow sweep
-    - bm25 benefits from wider exploration
+
     - similarity moderate range
 
     Returns dict like:
-      {"direct":[0.65,0.70,0.75], "bm25":[0.25,0.30,0.35,0.40,0.45], ...}
+      {"direct":[0.65,0.70,0.75],...}
     """
     def arange(start, stop, step):
         vals = []
@@ -89,9 +89,6 @@ def default_sweep_grid(base_thresholds: Dict[str, float]) -> Dict[str, List[floa
                                 0.025)
     grid["listlike"]   = arange(max(0.5, base_thresholds.get("listlike", 0.70) - 0.05),
                                 min(0.99, base_thresholds.get("listlike", 0.70) + 0.05),
-                                0.025)
-    grid["bm25"]       = arange(max(0.05, base_thresholds.get("bm25", 0.35) - 0.15),
-                                min(0.95, base_thresholds.get("bm25", 0.35) + 0.20),
                                 0.025)
     grid["similarity"] = arange(max(0.3, base_thresholds.get("similarity", 0.60) - 0.15),
                                 min(0.95, base_thresholds.get("similarity", 0.60) + 0.15),

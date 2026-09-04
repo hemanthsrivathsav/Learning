@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexar — Welcome</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#141728;--ink2:#3f4459;--muted:#6b7185;--line:#e4e7f0;--wash:#f7f8fc;--wash2:#eef0f7;
+  --chatbg:#f1f2f9;--nav:#22243c;
+  --indigo:#4f46e5;--indigo-l:#eef1fe;--indigo-d:#3730a3;--violet:#8b5cf6;
+  --green:#10b981;--amber:#f59e0b;--grey:#a3a8b8;--red:#dc4f4f;
+  --sh:0 1px 2px rgba(20,23,40,.04),0 10px 30px rgba(20,23,40,.06);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#fff;color:var(--ink);font-family:Inter,system-ui,sans-serif;
+  font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3,h4,b{font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-.025em;margin:0}
+p{margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding:0 30px}
+.wrap.wide{max-width:1440px}
+
+.nav{background:var(--nav);color:#fff;height:66px;display:flex;align-items:center}
+.nav .wrap{display:flex;align-items:center;gap:16px;width:100%}
+.burger{width:20px;display:flex;flex-direction:column;gap:4px}
+.burger i{height:1.5px;background:#c9ccda}
+.mark{width:22px;height:22px;border-radius:50%;border:2.5px solid var(--amber);display:grid;
+  place-items:center;margin-left:8px}
+.mark::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--amber)}
+.brand{font-weight:700;font-size:19px}
+.genie{margin:0 auto;background:#2e3152;border:1px solid #3d4168;border-radius:999px;padding:6px 15px;
+  font-size:12.5px;color:#d5d8e6;display:flex;align-items:center;gap:8px}
+.live{width:6px;height:6px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 0 0 rgba(16,185,129,.5);animation:ping 2.2s ease-out infinite}
+@keyframes ping{70%{box-shadow:0 0 0 8px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+.beta{border:1px solid #3d4168;border-radius:5px;padding:3px 9px;font-size:11px;color:#aab0c4}
+
+/* hero */
+.hero{position:relative;text-align:center;padding:60px 0 0;overflow:hidden;
+  background:linear-gradient(180deg,#f0f0ff 0%,#f8f8fd 46%,#fff 100%)}
+.hero::before{content:'';position:absolute;top:-190px;left:50%;transform:translateX(-50%);
+  width:920px;height:540px;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(99,102,241,.26),transparent);filter:blur(60px)}
+.hero .wrap{position:relative;z-index:2}
+.hero h1{font-size:clamp(30px,4.3vw,50px);font-weight:800;line-height:1.05;max-width:17ch;margin:0 auto 13px}
+.hero h1 .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.06em}
+.hero h1 .w i{display:inline-block;font-style:normal;transform:translateY(110%);
+  animation:rise .95s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes rise{to{transform:none}}
+.hero p{color:var(--muted);font-size:17px;max-width:50ch;margin:0 auto 26px;
+  opacity:0;animation:fd .8s .5s forwards}
+@keyframes fd{to{opacity:1}}
+.ctas{display:flex;gap:12px;justify-content:center;opacity:0;animation:fd .8s .68s forwards}
+.btn{border-radius:10px;padding:13px 25px;font-weight:600;font-size:15px;text-decoration:none;
+  border:1px solid transparent;cursor:pointer;font-family:inherit;display:inline-block}
+.solid{background:var(--indigo);color:#fff;box-shadow:0 10px 28px rgba(79,70,229,.3)}
+.solid:hover{background:#4338ca}
+.outline{border-color:var(--line);background:#fff;color:var(--ink)}
+.outline:hover{border-color:#c3c7e4}
+
+/* ---------------- showcase ---------------- */
+.showcase{position:relative;margin-top:52px;padding-bottom:92px}
+#links{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5;
+  opacity:0;transition:opacity .5s}
+#links.on{opacity:1}
+.app{max-width:900px;margin:0 auto;background:#fff;border:1px solid #d9dced;border-radius:14px;
+  box-shadow:0 34px 80px rgba(28,24,88,.2);overflow:hidden;position:relative;z-index:2;
+  opacity:0;animation:fd .9s .5s forwards}
+
+.abar{background:var(--nav);height:44px;display:flex;align-items:center;gap:11px;padding:0 14px}
+.abar .bg{width:15px;display:flex;flex-direction:column;gap:3px}
+.abar .bg i{height:1.3px;background:#c9ccda;display:block}
+.abar .mk{width:16px;height:16px;border-radius:50%;border:2px solid var(--amber);display:grid;place-items:center}
+.abar .mk::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--amber)}
+.abar .bd{font-family:'Plus Jakarta Sans';font-weight:700;font-size:14px;color:#fff}
+.abar .gp{margin:0 auto;background:#2e3152;border:1px solid #3d4168;border-radius:999px;
+  padding:3px 11px;font-size:10px;color:#d5d8e6;display:flex;align-items:center;gap:6px}
+.abar .gp i{width:5px;height:5px;border-radius:50%;background:var(--green)}
+.abar .bt{border:1px solid #3d4168;border-radius:4px;padding:2px 6px;font-size:9px;color:#aab0c4}
+
+.abody{display:grid;grid-template-columns:52px 1fr 244px;min-height:560px}
+
+/* icon rail */
+.irail{background:#fff;border-right:1px solid var(--line);padding:16px 0;
+  display:flex;flex-direction:column;align-items:center;gap:17px}
+.irail .ic{width:28px;height:28px;display:grid;place-items:center;color:#8a90a6;border-radius:8px}
+.irail .ic.acc{color:var(--indigo)}
+.irail .sep{width:24px;height:1px;background:var(--line)}
+
+/* chat */
+.chat{background:var(--chatbg);display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--line)}
+.chead{display:flex;align-items:center;gap:12px;padding:14px 17px}
+.back{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 12px;
+  font-size:12px;color:var(--indigo);font-weight:600;white-space:nowrap}
+.ctitle{font-family:'Plus Jakarta Sans';font-weight:700;font-size:15.5px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.newchat{margin-left:auto;background:var(--indigo);color:#fff;border-radius:8px;padding:7px 13px;
+  font-size:11.5px;font-weight:600;white-space:nowrap}
+.cbody{flex:1;padding:2px 17px 8px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+
+.you{background:var(--indigo);color:#fff;border-radius:12px;padding:11px 14px;
+  align-self:flex-end;max-width:76%;opacity:0;transform:translateY(8px);transition:.45s}
+.you.in{opacity:1;transform:none}
+.you .meta{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:4px}
+.you .who{font-size:9.5px;font-weight:700;letter-spacing:.09em;color:rgba(255,255,255,.72)}
+.you .ts{font-size:10px;color:rgba(255,255,255,.72)}
+.you .txt{font-size:14px;line-height:1.45}
+.cur{display:inline-block;width:1.5px;height:13px;background:#fff;vertical-align:-2px;
+  animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+.resp{opacity:0;transform:translateY(8px);transition:.5s}
+.resp.in{opacity:1;transform:none}
+.rlabel{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:6px}
+.rlabel b{font-size:9.5px;font-weight:700;letter-spacing:.09em;color:var(--indigo);white-space:nowrap}
+.rlabel .ts{font-size:10px;color:var(--muted)}
+.rcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 14px}
+.rcard .rt{display:flex;align-items:flex-start;gap:10px}
+.rcard h4{font-family:'Plus Jakarta Sans';font-size:14px;font-weight:700;margin-bottom:3px}
+.rcard .rd{color:var(--muted);font-size:12px}
+.acts{margin-left:auto;display:flex;align-items:center;gap:5px;flex:none}
+.iconbtn{width:26px;height:26px;border:1px solid var(--line);border-radius:7px;background:#fff;
+  display:grid;place-items:center;color:#8a90a6;flex:none}
+.fullb{background:var(--indigo);color:#fff;border-radius:7px;padding:6px 10px;font-size:11px;
+  font-weight:600;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.confpill{display:inline-flex;align-items:center;gap:6px;background:#ecfdf5;border:1px solid #c5eddc;
+  color:#047857;border-radius:999px;padding:3px 9px;font-size:10.5px;font-weight:600;margin-top:8px}
+.gd{width:6px;height:6px;border-radius:50%;background:var(--green);display:block}
+.chartbox{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.chartbox svg path.ln{stroke-dasharray:420;stroke-dashoffset:420;transition:stroke-dashoffset 1.5s .2s ease-out}
+.resp.in .chartbox svg path.ln{stroke-dashoffset:0}
+.clarcard{background:#fff;border:1px solid #e6dcfb;border-left:3px solid var(--violet);
+  border-radius:10px;padding:12px 14px}
+.clarcard b{font-family:'Plus Jakarta Sans';font-size:13px;display:block;margin-bottom:4px}
+.clarcard p{color:var(--muted);font-size:12px}
+.opts{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.opt{border:1px solid var(--line);background:#fff;border-radius:7px;padding:5px 10px;font-size:11px}
+.opt.sel{background:var(--violet);border-color:var(--violet);color:#fff;font-weight:500}
+
+.cfoot{padding:8px 17px 16px}
+.inputbar{background:#fff;border:1px solid var(--line);border-radius:999px;height:45px;
+  display:flex;align-items:center;padding:0 6px 0 19px;box-shadow:0 2px 8px rgba(20,23,40,.05);gap:10px}
+.inputbar span.ph{color:#9aa0b4;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.send{margin-left:auto;width:33px;height:33px;border-radius:50%;background:var(--indigo);
+  display:grid;place-items:center;flex:none}
+
+/* context panel */
+.ctx{background:#fff;padding:16px 14px;overflow:hidden}
+.ctxh{font-family:'Plus Jakarta Sans';font-weight:700;font-size:12.5px;letter-spacing:.02em;
+  padding-bottom:13px;border-bottom:1px solid var(--line);margin-bottom:15px}
+.sec{padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+.sec:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+.sech{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.sech b{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--ink)}
+.cnt{margin-left:auto;background:var(--indigo-l);color:var(--indigo-d);border-radius:999px;
+  padding:1px 8px;font-size:10px;font-weight:600}
+.car{color:#9aa0b4;font-size:8px}
+.sech .sr{color:#9aa0b4;display:grid;place-items:center}
+.sub2{color:var(--muted);font-size:10px;margin:-3px 0 8px;line-height:1.4}
+.prow{background:var(--wash);border:1px solid var(--line);border-radius:7px;padding:6px 9px;
+  font-size:11px;color:var(--ink2);margin-bottom:5px}
+.tool{display:inline-flex;align-items:center;gap:6px;background:var(--indigo-l);border:1px solid #d5daf9;
+  border-radius:999px;padding:4px 11px;font-family:'JetBrains Mono',monospace;font-size:10.5px;
+  color:var(--indigo-d);margin-bottom:5px}
+.tdesc{color:var(--muted);font-size:10px}
+.dash{border-left:2.5px solid var(--indigo);background:var(--wash);border-radius:0 7px 7px 0;
+  padding:7px 10px}
+.dash b{display:block;font-size:11px;font-family:'Plus Jakarta Sans'}
+.dash span{color:var(--muted);font-size:10px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.link{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.link .li{color:#9aa0b4;flex:none}
+.link .lt{min-width:0;flex:1}
+.link b{display:block;font-size:11px;font-family:Inter;font-weight:600;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.link span{color:var(--muted);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.openb{border:1px solid #c9cef1;color:var(--indigo);border-radius:7px;padding:3px 10px;
+  font-size:10px;font-weight:600;flex:none}
+
+/* callouts */
+.note{position:absolute;width:216px;background:#fff;border:1px solid var(--line);border-radius:13px;
+  padding:13px 15px;box-shadow:0 16px 38px rgba(28,24,88,.14);z-index:6;opacity:0}
+.note.in{animation:pop .62s cubic-bezier(.19,1,.22,1) forwards}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.95)}to{opacity:1;transform:none}}
+.note .lab{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);
+  margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.note .lab .d{width:6px;height:6px;border-radius:50%}
+.note b{font-size:12.5px;display:block;margin-bottom:3px}
+.note span{color:var(--muted);font-size:11px;line-height:1.55;display:block}
+.note.warn{border-color:#f2dada;background:#fefafa}
+.note.warn b{color:#a83c3c}
+.notesgrid{display:none}
+
+/* agents */
+section{padding:0 0 90px}
+.shead{text-align:center;max-width:54ch;margin:0 auto 32px}
+.shead h2{font-size:clamp(25px,3.1vw,35px);font-weight:800;margin-bottom:11px}
+.shead p{color:var(--muted);font-size:16.5px}
+.agrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ag{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;cursor:pointer;
+  font-family:inherit;text-align:left;color:var(--ink);box-shadow:var(--sh);position:relative;
+  overflow:hidden;transition:transform .28s,box-shadow .28s,border-color .28s,background .28s}
+.ag::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .35s;pointer-events:none;
+  background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%),rgba(79,70,229,.08),transparent 62%)}
+.ag:hover{transform:translateY(-3px);box-shadow:0 16px 38px rgba(24,20,80,.1);border-color:#d6d9ee}
+.ag:hover::before{opacity:1}
+.ag>*{position:relative}
+.ag .top{display:flex;align-items:center;gap:11px;margin-bottom:9px}
+.ag i{width:28px;height:28px;border-radius:50%;border:2px solid var(--indigo);color:var(--indigo);
+  display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:11px;
+  font-style:normal;flex:none;transition:.3s}
+.ag.v i{border-color:var(--violet);color:var(--violet)}
+.ag.g i{border-color:var(--green);color:var(--green)}
+.ag b{font-size:15.5px}
+.ag .arw{margin-left:auto;color:var(--grey);transition:transform .28s}
+.ag:hover .arw{transform:translateX(4px)}
+.ag p{color:var(--muted);font-size:13.5px}
+.ag.sel{background:var(--ink);border-color:var(--ink);color:#fff}
+.ag.sel p{color:#a9aec4}
+.ag.sel i{border-color:rgba(255,255,255,.55);color:#fff}
+.ag.sel .arw{color:#fff;transform:rotate(90deg)}
+.detail{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:18px;
+  box-shadow:0 18px 44px rgba(24,20,80,.09);overflow:hidden;display:none}
+.detail.on{display:block;animation:grow .45s ease-out}
+@keyframes grow{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.dinner{display:grid;grid-template-columns:1fr 1fr;gap:44px;padding:34px 36px}
+.kick{display:inline-flex;align-items:center;gap:9px;background:var(--wash);border:1px solid var(--line);
+  border-radius:999px;padding:6px 14px;font-size:12.5px;color:var(--ink2);margin-bottom:16px}
+.kick .d{width:7px;height:7px;border-radius:50%}
+.dcopy h3{font-size:clamp(21px,2.5vw,29px);font-weight:800;margin-bottom:12px;max-width:19ch}
+.dcopy p{color:var(--muted);font-size:16px;max-width:46ch}
+.close2{margin-top:22px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 15px;
+  font-family:inherit;font-size:13px;cursor:pointer;color:var(--ink2)}
+.close2:hover{border-color:#c4c8e8}
+.frag{background:var(--wash);border:1px solid var(--line);border-radius:14px;padding:22px}
+.cls{display:flex;flex-direction:column;gap:11px}
+.cl{display:grid;grid-template-columns:1fr 54px;gap:14px;align-items:center;font-size:13.5px;color:var(--muted)}
+.cl.win{color:var(--ink);font-weight:600}
+.clbar{height:7px;background:#e4e7f1;border-radius:4px;overflow:hidden;margin-top:6px}
+.clbar span{display:block;height:100%;border-radius:4px;background:#cfd3e6;width:0;transition:width 1s ease-out}
+.cl.win .clbar span{background:linear-gradient(90deg,var(--indigo),var(--violet))}
+.cl .pct{font-family:'JetBrains Mono',monospace;font-size:12px;text-align:right}
+.glossary{display:grid;grid-template-columns:1fr 36px 1fr;gap:12px;align-items:center}
+.gcol{display:flex;flex-direction:column;gap:9px}
+.wchip{border:1px solid var(--line);background:#fff;border-radius:9px;padding:10px 12px;
+  font-size:13px;color:var(--muted);text-align:center}
+.arw2{display:grid;place-items:center;color:var(--grey);font-size:18px}
+.mchip{border:2px solid #c7cdf7;background:var(--indigo-l);border-radius:12px;padding:15px 11px;text-align:center}
+.mchip b{display:block;font-family:'JetBrains Mono',monospace;font-size:13.5px;color:var(--indigo-d)}
+.mchip span{font-size:11.5px;color:var(--muted)}
+.sql{background:#1b1e33;border-radius:11px;padding:15px 17px;font-family:'JetBrains Mono',monospace;
+  font-size:12px;line-height:1.85;color:#c8cde6;margin-bottom:13px;overflow-x:auto}
+.sql .k{color:#a5b4fc}.sql .s{color:#6ee7b7}.sql .c{color:#6b7290}
+.permrow{display:flex;gap:8px;flex-wrap:wrap}
+.perm{border:1px solid #bfe8d7;background:#f0fdf7;border-radius:8px;padding:7px 11px;
+  font-size:12px;color:#04674c;display:flex;align-items:center;gap:7px}
+.charts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.ct{border:1.5px solid var(--line);border-radius:12px;padding:13px 8px;text-align:center;background:#fff}
+.ct.pick{border-color:var(--indigo);background:var(--indigo-l)}
+.ct svg{margin-bottom:8px}
+.ct b{display:block;font-size:12px}
+.ct span{font-size:10.5px;color:var(--muted)}
+.reason{background:#fff;border:1px solid var(--line);border-left:3px solid var(--indigo);border-radius:9px;
+  padding:12px 14px;font-size:13px;color:var(--ink2)}
+.tl{list-style:none;padding:0;margin:0}
+.tl li{display:grid;grid-template-columns:25px 1fr;gap:12px;padding:10px 0;
+  border-bottom:1px solid var(--line);align-items:center;font-size:13px}
+.tl li:last-child{border-bottom:0}
+.tl i{width:25px;height:25px;border-radius:50%;border:1.8px solid var(--indigo);color:var(--indigo);
+  display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-style:normal}
+.tl li:nth-child(2) i,.tl li:nth-child(3) i{border-color:var(--violet);color:var(--violet)}
+.tl li:nth-child(5) i,.tl li:nth-child(6) i{border-color:var(--green);color:var(--green)}
+.tl code{background:var(--indigo-l);color:var(--indigo-d);border-radius:4px;padding:2px 6px;
+  font-family:'JetBrains Mono',monospace;font-size:11px}
+.ringrow{display:flex;align-items:center;gap:16px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.ring{width:70px;height:70px;border-radius:50%;flex:none;display:grid;place-items:center;
+  background:conic-gradient(var(--green) 338deg,#e4e7f1 0)}
+.ring i{width:56px;height:56px;border-radius:50%;background:#fff;display:grid;place-items:center;
+  font-family:'Plus Jakarta Sans';font-weight:800;font-size:16px;font-style:normal}
+.ringrow p{color:var(--muted);font-size:13px}
+
+.final{text-align:center;padding:0 0 104px}
+.final h2{font-size:clamp(26px,3.4vw,38px);font-weight:800;max-width:19ch;margin:0 auto 24px}
+
+@media(max-width:1420px){
+  #links{display:none}
+  .noteshost{display:none}
+  .notesgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:900px;margin:28px auto 0}
+  .notesgrid .note{position:static;width:auto;opacity:1;animation:none}
+}
+@media(max-width:900px){
+  .abody{grid-template-columns:1fr}
+  .irail,.ctx{display:none}
+  .agrid{grid-template-columns:1fr 1fr}
+  .dinner{grid-template-columns:1fr;gap:26px;padding:26px 22px}
+  .notesgrid{grid-template-columns:1fr 1fr}
+  .wrap{padding:0 18px}
+}
+@media(max-width:600px){.agrid,.notesgrid,.charts{grid-template-columns:1fr}
+  .fullb span{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
+  .app,.you,.resp,.note{opacity:1;transform:none}
+  .chartbox svg path.ln{stroke-dashoffset:0}
+  .hero p,.ctas{opacity:1}.hero h1 .w i{transform:none}#links{opacity:1}}
+:focus-visible{outline:2px solid var(--indigo);outline-offset:3px;border-radius:9px}
+</style>
+</head>
+<body>
+
+<nav class="nav"><div class="wrap">
+  <div class="burger"><i></i><i></i><i></i></div>
+  <div class="mark"></div><div class="brand">Nexar</div>
+  <div class="genie"><span class="live"></span>Powered by Databricks Genie</div>
+  <div class="beta">BETA</div>
+</div></nav>
+
+<header class="hero">
+  <div class="wrap">
+    <h1 id="kin"></h1>
+    <p>A governed semantic layer on Databricks. Ask in your own words, get a number you can defend.</p>
+    <div class="ctas">
+      <a class="btn solid" href="#">Browse spaces</a>
+      <a class="btn outline" href="#agents">See the agents</a>
+    </div>
+  </div>
+
+  <div class="wrap wide">
+    <div class="showcase" id="showcase">
+      <svg id="links"></svg>
+
+      <div class="app" id="app">
+        <div class="abar">
+          <div class="bg"><i></i><i></i><i></i></div>
+          <div class="mk"></div><div class="bd">Nexar</div>
+          <div class="gp"><i></i>Powered by Databricks Genie</div>
+          <div class="bt">BETA</div>
+        </div>
+
+        <div class="abody">
+          <div class="irail">
+            <div class="ic acc"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+            <div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+            <div class="sep"></div>
+            <div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+            <div class="ic" id="a-models"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg></div>
+            <div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M16.5 6.5H10a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6H7"/></svg></div>
+            <div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 11a8 8 0 1 0-2 6"/><path d="M20 5v6h-6"/></svg></div>
+          </div>
+
+          <div class="chat">
+            <div class="chead">
+              <span class="back">&larr; Back</span>
+              <span class="ctitle" id="a-title">Renewals Caseflow Management</span>
+              <span class="newchat">+ New chat</span>
+            </div>
+
+            <div class="cbody">
+              <div class="you" id="a-q">
+                <div class="meta"><span class="who">YOU</span><span class="ts">04:44 PM</span></div>
+                <div class="txt" id="qtxt"><span class="cur"></span></div>
+              </div>
+
+              <div class="resp" id="clar">
+                <div class="rlabel"><b>NEXAR · AMBIGUITY AGENT</b><span class="ts">04:44 PM</span></div>
+                <div class="clarcard" id="a-clar">
+                  <b>Fiscal or calendar quarter?</b>
+                  <p>Two certified calendars match "last quarter" here.</p>
+                  <div class="opts"><span class="opt sel">Fiscal Q2 FY26</span><span class="opt">Calendar Q2 2026</span></div>
+                </div>
+              </div>
+
+              <div class="resp" id="ans">
+                <div class="rlabel"><b>NEXAR ANSWER</b><span class="ts">04:45 PM</span></div>
+                <div class="rcard">
+                  <div class="rt">
+                    <div>
+                      <h4>Renewal rate, EMEA — down 6.2 points</h4>
+                      <div class="rd">Q2 FY26. Concentrated in mid-market accounts renewing after the May price change.</div>
+                      <span class="confpill" id="a-conf"><span class="gd"></span>94% confidence · renewal_rate v4</span>
+                    </div>
+                    <div class="acts">
+                      <span class="iconbtn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg></span>
+                      <span class="iconbtn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 11a8 8 0 1 0-2 6"/><path d="M20 5v6h-6"/></svg></span>
+                      <span class="fullb"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/></svg><span>Full screen</span></span>
+                    </div>
+                  </div>
+                  <div class="chartbox" id="a-chart">
+                    <svg viewBox="0 0 340 66" width="100%" height="66" preserveAspectRatio="none">
+                      <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stop-color="#4f46e5" stop-opacity=".16"/>
+                        <stop offset="1" stop-color="#4f46e5" stop-opacity="0"/></linearGradient></defs>
+                      <line x1="0" y1="17" x2="340" y2="17" stroke="#f0f2f8"/>
+                      <line x1="0" y1="43" x2="340" y2="43" stroke="#f0f2f8"/>
+                      <path d="M8,17 L62,14 L116,21 L170,29 L224,44 L278,52 L332,58 L332,62 L8,62 Z" fill="url(#g1)"/>
+                      <path class="ln" d="M8,17 L62,14 L116,21 L170,29 L224,44 L278,52 L332,58" fill="none"
+                        stroke="#4f46e5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cfoot">
+              <div class="inputbar" id="a-input">
+                <span class="ph">Message Genie in Renewals Caseflow Management…</span>
+                <span class="send"><svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M3 20l19-8L3 4l4 8-4 8z"/></svg></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ctx">
+            <div class="ctxh">CONTEXT PANEL</div>
+
+            <div class="sec" id="a-prompts">
+              <div class="sech"><b>CERTIFIED PROMPTS</b>
+                <span class="sr"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></span>
+                <span class="cnt">3</span><span class="car">▾</span></div>
+              <div class="sub2">Click to edit, double click to send</div>
+              <div class="prow">Renewal rate by segment</div>
+              <div class="prow">Top SLA breaches this week</div>
+              <div class="prow">Accounts pending information</div>
+            </div>
+
+            <div class="sec" id="a-tools">
+              <div class="sech"><b>TOOLS</b><span class="cnt">1</span><span class="car">▾</span></div>
+              <span class="tool"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>@charts</span>
+              <div class="tdesc">Visualize query results as a chart</div>
+            </div>
+
+            <div class="sec" id="a-dashsec">
+              <div class="sech"><b>DASHBOARDS</b><span class="cnt">1</span><span class="car">▾</span></div>
+              <div class="dash"><b>Renewals Caseflow - Sigma</b>
+                <span>Embedded Sigma dashboard for Rene…</span></div>
+            </div>
+
+            <div class="sec" id="a-links">
+              <div class="sech"><b>SOURCE LINKS</b><span class="cnt">2</span><span class="car">▾</span></div>
+              <div class="link">
+                <span class="li"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></span>
+                <span class="lt"><b>renewal_global_dashbo…</b><span>Primary BYOD dataset for R…</span></span>
+                <span class="openb">Open</span>
+              </div>
+              <div class="link" style="margin-bottom:0">
+                <span class="li"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></span>
+                <span class="lt"><b>colt_launchpad</b><span>Primary BYOD dataset for R…</span></span>
+                <span class="openb">Open</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- callouts: 3 left, 4 right, generous vertical spacing -->
+      <div class="noteshost" id="noteshost">
+        <div class="note" data-anchor="#a-models" data-side="left" style="left:0;top:56px">
+          <div class="lab"><span class="d" style="background:var(--indigo)"></span>models &amp; tokenomics</div>
+          <b>Choose the model per agent</b>
+          <span>Per-room model selection, with token spend tracked as you go.</span>
+        </div>
+
+        <div class="note" data-anchor="#a-clar" data-side="left" style="left:0;top:262px">
+          <div class="lab"><span class="d" style="background:var(--violet)"></span>ambiguity agent</div>
+          <b>It asks before it guesses</b>
+          <span>Two calendars match. Asked once, then remembered for the room.</span>
+        </div>
+
+        <div class="note warn" data-anchor="#a-input" data-side="left" style="left:0;top:468px">
+          <div class="lab"><span class="d" style="background:var(--red)"></span>ask anything in scope</div>
+          <b>It stops rather than guessing</b>
+          <span>Named individuals and unmodelled data get a boundary, not a guess.</span>
+        </div>
+
+        <div class="note" data-anchor="#a-prompts" data-side="right" style="right:0;top:34px">
+          <div class="lab"><span class="d" style="background:var(--amber)"></span>certified prompts</div>
+          <b>Questions already signed off</b>
+          <span>Vetted per room by the data team, ready to run.</span>
+        </div>
+
+        <div class="note" data-anchor="#a-tools" data-side="right" style="right:0;top:186px">
+          <div class="lab"><span class="d" style="background:var(--indigo)"></span>tools</div>
+          <b>Agents you can call by name</b>
+          <span>@charts turns a result into the visual that fits it.</span>
+        </div>
+
+        <div class="note" data-anchor="#a-dashsec" data-side="right" style="right:0;top:338px">
+          <div class="lab"><span class="d" style="background:var(--green)"></span>dashboards</div>
+          <b>Open one inside the chat</b>
+          <span>Sigma dashboards embed in the thread. No tab switching.</span>
+        </div>
+
+        <div class="note" data-anchor="#a-links" data-side="right" style="right:0;top:490px">
+          <div class="lab"><span class="d" style="background:var(--green)"></span>source links</div>
+          <b>Walk back to the tables</b>
+          <span>Every answer names the datasets behind it.</span>
+        </div>
+      </div>
+
+      <div class="notesgrid" id="notesgrid"></div>
+    </div>
+  </div>
+</header>
+
+<section id="agents">
+  <div class="wrap">
+    <div class="shead">
+      <h2>Six agents built that answer</h2>
+      <p>Each runs on every question, on a model you choose. Open any of them.</p>
+    </div>
+    <div class="agrid" id="agrid">
+      <button class="ag" data-i="0"><div class="top"><i>1</i><b>Intent mapping</b><span class="arw">&rarr;</span></div>
+        <p>Classifies the question before anything is queried.</p></button>
+      <button class="ag v" data-i="1"><div class="top"><i>2</i><b>Ambiguity</b><span class="arw">&rarr;</span></div>
+        <p>Asks one clarifying question instead of guessing.</p></button>
+      <button class="ag v" data-i="2"><div class="top"><i>3</i><b>Semantic resolution</b><span class="arw">&rarr;</span></div>
+        <p>Maps your words onto certified entities and metrics.</p></button>
+      <button class="ag" data-i="3"><div class="top"><i>4</i><b>Query generation</b><span class="arw">&rarr;</span></div>
+        <p>Runs it in your workspace, under your permissions.</p></button>
+      <button class="ag g" data-i="4"><div class="top"><i>5</i><b>Charting</b><span class="arw">&rarr;</span></div>
+        <p>The @charts tool picks the visual that fits.</p></button>
+      <button class="ag g" data-i="5"><div class="top"><i>6</i><b>Confidence &amp; trace</b><span class="arw">&rarr;</span></div>
+        <p>Scores the mapping and names the source tables.</p></button>
+    </div>
+
+    <div class="detail" id="detail">
+      <div class="dinner">
+        <div class="dcopy">
+          <span class="kick" id="kick"></span>
+          <h3 id="dh3"></h3>
+          <p id="dp"></p>
+          <button class="close2" id="close2">Close</button>
+        </div>
+        <div class="frag" id="frag"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="final"><div class="wrap">
+  <h2>Fourteen governed rooms are live</h2>
+  <a class="btn solid" href="#">Browse all spaces</a>
+</div></div>
+
+<script>
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const words=['Your','data,','answered','in','a','sentence.'];
+document.getElementById('kin').innerHTML=words.map((w,i)=>
+  `<span class="w"><i style="animation-delay:${i*55}ms">${w}</i></span>`).join(' ');
+
+const Q='Why did EMEA renewals drop last quarter?';
+const you=document.getElementById('a-q'),qtxt=document.getElementById('qtxt'),
+      clar=document.getElementById('clar'),ans=document.getElementById('ans'),
+      links=document.getElementById('links'),
+      notes=[...document.querySelectorAll('#noteshost .note')];
+
+function drawLinks(){
+  const host=document.getElementById('showcase');
+  if(getComputedStyle(document.getElementById('noteshost')).display==='none'){
+    links.classList.remove('on');links.innerHTML='';return}
+  const hb=host.getBoundingClientRect();
+  links.setAttribute('width',hb.width);links.setAttribute('height',hb.height);
+  links.setAttribute('viewBox',`0 0 ${hb.width} ${hb.height}`);
+  let s='';
+  notes.forEach(n=>{
+    const tgt=document.querySelector(n.dataset.anchor);if(!tgt)return;
+    const nb=n.getBoundingClientRect(),tb=tgt.getBoundingClientRect();
+    const right=n.dataset.side==='right';
+    const x1=(right?nb.left:nb.right)-hb.left;
+    const y1=nb.top-hb.top+nb.height/2;
+    const x2=(right?tb.right+4:tb.left-4)-hb.left;
+    const y2=tb.top-hb.top+Math.min(tb.height/2,32);
+    const mx=(x1+x2)/2;
+    s+=`<path d="M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}" fill="none"
+         stroke="#c3c8e6" stroke-width="1.4" stroke-dasharray="4 4"/>`
+     +`<circle cx="${x1}" cy="${y1}" r="2.6" fill="#c3c8e6"/>`
+     +`<circle cx="${x2}" cy="${y2}" r="3.6" fill="#fff" stroke="#4f46e5" stroke-width="1.8"/>`;
+  });
+  links.innerHTML=s;links.classList.add('on');
+}
+let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(drawLinks,150)});
+
+function revealNotes(){
+  notes.forEach((n,k)=>setTimeout(()=>{
+    n.classList.add('in');
+    if(k===notes.length-1)setTimeout(drawLinks,400);
+  },k*150));
+}
+
+if(reduce){
+  qtxt.textContent=Q;you.classList.add('in');clar.classList.add('in');ans.classList.add('in');
+  notes.forEach(n=>n.classList.add('in'));setTimeout(drawLinks,80);
+}else{
+  setTimeout(()=>you.classList.add('in'),1000);
+  let i=0;
+  const type=()=>{qtxt.innerHTML=Q.slice(0,++i)+'<span class="cur"></span>';
+    if(i<Q.length)setTimeout(type,32);
+    else{qtxt.textContent=Q;
+      setTimeout(()=>clar.classList.add('in'),500);
+      setTimeout(()=>ans.classList.add('in'),1500);
+      setTimeout(revealNotes,2200)}};
+  setTimeout(type,1300);
+}
+
+document.getElementById('notesgrid').innerHTML=notes
+  .map(n=>`<div class="note${n.classList.contains('warn')?' warn':''}">${n.innerHTML}</div>`).join('');
+
+/* ---------- agent details ---------- */
+const AG=[
+{n:'Intent mapping',dot:'var(--indigo)',
+ h:'First — what kind of question is this?',
+ p:'Nothing is queried until the question has been classified. The shape decides everything downstream: a trend needs a time series, a ranking needs a comparison, a lookup needs neither.',
+ frag:`<div class="cls">
+   <div class="cl win"><div>Trend with a causal drill-down<div class="clbar"><span data-w="92"></span></div></div><span class="pct">92%</span></div>
+   <div class="cl"><div>Ranked comparison<div class="clbar"><span data-w="4"></span></div></div><span class="pct">4%</span></div>
+   <div class="cl"><div>Single value lookup<div class="clbar"><span data-w="3"></span></div></div><span class="pct">3%</span></div>
+   <div class="cl"><div>Forecast<div class="clbar"><span data-w="1"></span></div></div><span class="pct">1%</span></div>
+ </div>`},
+{n:'Ambiguity',dot:'var(--violet)',
+ h:'Then it refuses to guess',
+ p:'"Last quarter" is genuinely ambiguous here — two certified calendars match it. Rather than picking one silently and being quietly wrong, Nexar asks. The answer is stored against the room, so the team is asked once, not every time.',
+ frag:`<div class="clarcard"><b>Fiscal or calendar quarter?</b>
+     <p>Two certified calendars match "last quarter" in this space.</p>
+     <div class="opts"><span class="opt sel">Fiscal Q2 FY26</span><span class="opt">Calendar Q2 2026</span></div></div>
+   <div class="reason" style="margin-top:13px">Answered once by the room owner. Every later question here resolves "last quarter" the same way.</div>`},
+{n:'Semantic resolution',dot:'var(--violet)',
+ h:'Three phrasings, one certified number',
+ p:'Nobody has to learn a schema. However someone asks it, the question lands on the definition the data team signed off — not on whichever table looked closest.',
+ frag:`<div class="glossary">
+   <div class="gcol"><span class="wchip">"churn"</span><span class="wchip">"lapsed"</span><span class="wchip">"non-renewed"</span></div>
+   <div class="arw2">&rarr;</div>
+   <div class="mchip"><b>renewal_rate</b><span>certified · v4 · Finance Data</span></div>
+ </div>`},
+{n:'Query generation',dot:'var(--indigo)',
+ h:'The query runs where the data already lives',
+ p:'Executed inside your Databricks workspace under the permissions you already hold. Nexar keeps no copy of your data, and it cannot widen what someone can already see.',
+ frag:`<div class="sql"><span class="c">-- built from the certified metric, not the raw tables</span><br>
+   <span class="k">SELECT</span> period, renewal_rate<br>
+   <span class="k">FROM</span> metrics.renewal_rate_v4<br>
+   <span class="k">WHERE</span> region = <span class="s">'EMEA'</span><br>
+   &nbsp;&nbsp;<span class="k">AND</span> fiscal_quarter = <span class="s">'Q2 FY26'</span></div>
+   <div class="permrow">
+     <span class="perm"><span class="gd"></span>Unity Catalog permissions</span>
+     <span class="perm"><span class="gd"></span>Runs in your workspace</span>
+     <span class="perm"><span class="gd"></span>Logged for audit</span>
+   </div>`},
+{n:'Charting',dot:'var(--green)',
+ h:'The chart is chosen, not defaulted',
+ p:'It runs as the @charts tool in the context panel — automatically on most answers, or on demand when you call it. The visual follows the shape of the question, so splitting by segment changes the chart with it.',
+ frag:`<div class="charts">
+   <div class="ct pick"><svg width="46" height="26" viewBox="0 0 46 26"><path d="M3 21 L13 16 L21 18 L29 8 L43 4" fill="none" stroke="#4f46e5" stroke-width="2.2" stroke-linecap="round"/></svg>
+     <b>Time series</b><span>chosen</span></div>
+   <div class="ct"><svg width="46" height="26" viewBox="0 0 46 26"><rect x="5" y="11" width="8" height="12" rx="2" fill="#d6d9ee"/><rect x="19" y="5" width="8" height="18" rx="2" fill="#d6d9ee"/><rect x="33" y="15" width="8" height="8" rx="2" fill="#d6d9ee"/></svg>
+     <b>Bar</b><span>not used</span></div>
+   <div class="ct"><svg width="46" height="26" viewBox="0 0 46 26"><circle cx="23" cy="13" r="9" fill="none" stroke="#d6d9ee" stroke-width="4.5"/><path d="M23 4 a9 9 0 0 1 7.8 13.5" fill="none" stroke="#c3c7e0" stroke-width="4.5"/></svg>
+     <b>Composition</b><span>not used</span></div>
+ </div>
+ <div class="reason">The question asks why a number <em>moved</em>. Movement over time is a line — a bar chart would hide the trajectory that makes the answer useful.</div>`},
+{n:'Confidence & trace',dot:'var(--green)',
+ h:'And it hands you the reasoning',
+ p:'The mapping is scored on the answer itself, and the datasets behind it are listed under source links — so anyone can walk back from the number to the tables it came from.',
+ frag:`<ul class="tl">
+   <li><i>1</i><span>Intent read as a trend with a causal drill-down</span></li>
+   <li><i>2</i><span>Ambiguity raised — resolved to <code>Q2 FY26</code></span></li>
+   <li><i>3</i><span>"renewals" resolved to <code>renewal_rate</code> v4</span></li>
+   <li><i>4</i><span>Query run on <code>renewal_global_dashboard</code></span></li>
+   <li><i>5</i><span>Chart type chosen: time series</span></li>
+   <li><i>6</i><span>Mapping scored <code>0.94</code> and stored</span></li>
+ </ul>
+ <div class="ringrow"><div class="ring"><i>94%</i></div>
+   <p>Confidence reflects how cleanly the question mapped onto a certified metric — not how sure the model feels about the number.</p></div>`}];
+
+const ags=[...document.querySelectorAll('.ag')],detail=document.getElementById('detail');
+let open=-1;
+function show(i){
+  if(open===i){hide();return}
+  open=i;const a=AG[i];
+  ags.forEach((x,k)=>x.classList.toggle('sel',k===i));
+  document.getElementById('kick').innerHTML=`<span class="d" style="background:${a.dot}"></span>Agent ${i+1} · ${a.n}`;
+  document.getElementById('dh3').textContent=a.h;
+  document.getElementById('dp').textContent=a.p;
+  document.getElementById('frag').innerHTML=a.frag;
+  detail.classList.add('on');
+  requestAnimationFrame(()=>document.querySelectorAll('.clbar span')
+    .forEach(b=>setTimeout(()=>b.style.width=b.dataset.w+'%',80)));
+}
+function hide(){open=-1;ags.forEach(x=>x.classList.remove('sel'));detail.classList.remove('on')}
+ags.forEach(a=>{
+  a.onclick=()=>show(+a.dataset.i);
+  a.addEventListener('pointermove',e=>{const b=a.getBoundingClientRect();
+    a.style.setProperty('--mx',(e.clientX-b.left)+'px');
+    a.style.setProperty('--my',(e.clientY-b.top)+'px')});
+});
+document.getElementById('close2').onclick=hide;
+</script>
+</body>
+</html>

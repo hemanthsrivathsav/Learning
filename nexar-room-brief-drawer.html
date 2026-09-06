@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexar — Room brief drawer</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#141728;--ink2:#3f4459;--muted:#6b7185;--line:#e4e7f0;--wash:#f7f8fc;--wash2:#eef0f7;
+  --chatbg:#f1f2f9;--nav:#22243c;
+  --indigo:#4f46e5;--indigo-l:#eef1fe;--indigo-d:#3730a3;--violet:#8b5cf6;
+  --green:#10b981;--amber:#f59e0b;--grey:#a3a8b8;--red:#dc4f4f;
+  --acc:#f59e0b;--acc-soft:rgba(245,158,11,.13);--acc-line:rgba(245,158,11,.34);
+}
+*{box-sizing:border-box}
+body{margin:0;background:#e9ebf3;color:var(--ink);font-family:Inter,system-ui,sans-serif;
+  font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow:hidden}
+h1,h2,h3,h4,b{font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-.024em;margin:0}
+p{margin:0}
+button{font-family:inherit;cursor:pointer}
+
+/* demo bar */
+.demo{background:#1b1e33;color:#c3c8e0;padding:9px 18px;display:flex;align-items:center;gap:10px;
+  font-size:12.5px;height:39px;flex-wrap:wrap}
+.demo b{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.09em;color:#7f86a8}
+.demo button{background:transparent;border:1px solid #363a5c;color:#c3c8e0;border-radius:7px;
+  padding:5px 12px;font-size:12.5px;display:flex;align-items:center;gap:8px}
+.demo button[aria-pressed=true]{background:#2c3050;border-color:#4a4f78;color:#fff;font-weight:600}
+.demo .d{width:7px;height:7px;border-radius:50%}
+.demo .rs{margin-left:auto;border-color:#4a4f78}
+
+/* shell */
+.nav{background:var(--nav);color:#fff;height:58px;display:flex;align-items:center;gap:14px;padding:0 20px}
+.burger{width:19px;display:flex;flex-direction:column;gap:4px}
+.burger i{height:1.5px;background:#c9ccda}
+.mark{width:21px;height:21px;border-radius:50%;border:2.5px solid var(--amber);display:grid;
+  place-items:center;margin-left:6px}
+.mark::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--amber)}
+.brand{font-weight:700;font-size:18px}
+.genie{margin:0 auto;background:#2e3152;border:1px solid #3d4168;border-radius:999px;padding:5px 14px;
+  font-size:12px;color:#d5d8e6;display:flex;align-items:center;gap:8px}
+.lv{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.beta{border:1px solid #3d4168;border-radius:5px;padding:3px 9px;font-size:10.5px;color:#aab0c4}
+
+.shell{display:grid;grid-template-columns:52px 1fr 286px;height:calc(100vh - 58px - 39px);min-height:640px}
+.irail{background:#fff;border-right:1px solid var(--line);padding:14px 0;
+  display:flex;flex-direction:column;align-items:center;gap:16px}
+.irail .ic{width:28px;height:28px;display:grid;place-items:center;color:#8a90a6;border-radius:8px}
+.irail .ic.acc{color:var(--indigo)}
+.irail .sep{width:24px;height:1px;background:var(--line)}
+
+.chat{background:var(--chatbg);display:flex;flex-direction:column;min-width:0;overflow:hidden}
+
+/* ---------- header with Details trigger ---------- */
+.chead{display:flex;align-items:center;gap:12px;padding:13px 20px;flex:none}
+.back{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 13px;
+  font-size:12.5px;color:var(--indigo);font-weight:600}
+.roomdot{width:9px;height:9px;border-radius:50%;background:var(--acc);flex:none;margin-left:2px}
+.ctitle{font-family:'Plus Jakarta Sans';font-weight:700;font-size:17px}
+.details{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 12px;
+  font-size:12.5px;color:var(--ink2);display:flex;align-items:center;gap:8px;transition:.2s}
+.details:hover{border-color:var(--acc-line);background:var(--acc-soft)}
+.details[aria-expanded=true]{border-color:var(--acc-line);background:var(--acc-soft);
+  color:var(--ink);font-weight:600}
+.details svg.cv{transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.details[aria-expanded=true] svg.cv{transform:rotate(180deg)}
+.details .ico{width:15px;height:15px;border-radius:50%;border:1.5px solid currentColor;
+  display:grid;place-items:center;font-size:9px;font-weight:700;font-family:'Plus Jakarta Sans';
+  opacity:.75}
+.newchat{margin-left:auto;background:var(--indigo);color:#fff;border:0;border-radius:8px;
+  padding:8px 14px;font-size:12.5px;font-weight:600}
+
+/* ---------- drawer ---------- */
+.drawer{flex:none;overflow:hidden;max-height:0;
+  transition:max-height .45s cubic-bezier(.4,0,.2,1);}
+.drawer.open{max-height:760px}
+.dinner{padding:0 20px 14px;opacity:0;transform:translateY(-10px);
+  transition:opacity .35s .06s,transform .4s cubic-bezier(.19,1,.22,1) .06s}
+.drawer.open .dinner{opacity:1;transform:none}
+
+/* ---------- the brief card ---------- */
+.brief{background:#fff;border:1px solid var(--line);border-radius:13px;overflow:hidden;
+  box-shadow:0 1px 3px rgba(20,23,40,.05),0 12px 34px rgba(20,23,40,.07)}
+.bhead{background:linear-gradient(120deg,var(--acc-soft),rgba(255,255,255,0) 62%);
+  padding:16px 20px;border-bottom:1px solid var(--line);position:relative}
+.bhead::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--acc)}
+.bhead .r{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.bhead .dot{width:10px;height:10px;border-radius:50%;background:var(--acc)}
+.bhead h4{font-size:17.5px;font-weight:800}
+.spaceid{background:#fff;border:1px solid var(--acc-line);color:var(--ink2);border-radius:6px;
+  padding:3px 9px;font-family:'JetBrains Mono',monospace;font-size:11px}
+.freshpill{display:inline-flex;align-items:center;gap:6px;background:#ecfdf5;border:1px solid #c5eddc;
+  color:#047857;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:600}
+.gd{width:6px;height:6px;border-radius:50%;background:var(--green);display:block}
+.bpurpose{color:var(--ink2);font-size:13.5px;max-width:78ch}
+
+.bbody{padding:16px 20px}
+.scope4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.sc{background:var(--wash);border:1px solid var(--line);border-radius:10px;padding:11px 13px}
+.sc .k{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.09em;
+  color:var(--muted);margin-bottom:4px}
+.sc .v{font-family:'Plus Jakarta Sans';font-weight:700;font-size:13.5px}
+.sc .v small{display:block;font-weight:500;color:var(--muted);font-size:11px;letter-spacing:0}
+
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.col h5{font-size:13px;display:flex;align-items:center;gap:9px;margin-bottom:9px;
+  font-family:'Plus Jakarta Sans';font-weight:700}
+.col h5 .d{width:8px;height:8px;border-radius:50%}
+.col ul{list-style:none;padding:0;margin:0}
+.col li{position:relative;padding:4px 0 4px 16px;font-size:13px;color:var(--ink2)}
+.col li::before{content:'';position:absolute;left:0;top:12px;width:5px;height:5px;border-radius:50%}
+.ok li::before{background:var(--green)}
+.no li{color:var(--muted)}
+.no li::before{background:var(--grey)}
+.no li em{font-style:normal;color:var(--indigo);font-weight:500}
+
+.trylbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.09em;
+  color:var(--muted);margin:16px 0 9px}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 14px;
+  font-size:12.5px;color:var(--ink2);transition:.2s;text-align:left}
+.chip:hover{border-color:var(--acc);background:var(--acc-soft);color:var(--ink);transform:translateY(-1px)}
+
+.bfoot{border-top:1px solid var(--line);background:var(--wash);padding:10px 20px;display:flex;
+  align-items:center;gap:10px;font-size:11.5px;color:var(--muted);flex-wrap:wrap}
+.bfoot b{font-family:Inter;font-weight:600;color:var(--ink2);font-size:11.5px}
+.bfoot .hide{margin-left:auto;background:#fff;border:1px solid var(--line);border-radius:7px;
+  padding:5px 11px;font-size:11.5px;color:var(--ink2);display:flex;align-items:center;gap:6px}
+.bfoot .hide:hover{border-color:#c4c8e8}
+
+/* chat body */
+.cbody{flex:1;overflow-y:auto;padding:0 20px 8px;display:flex;flex-direction:column;gap:14px}
+.you{background:var(--indigo);color:#fff;border-radius:12px;padding:12px 15px;
+  align-self:flex-end;max-width:70%;flex:none;animation:rise .4s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.you .meta{display:flex;justify-content:space-between;gap:20px;margin-bottom:4px}
+.you .who{font-size:10px;font-weight:700;letter-spacing:.09em;color:rgba(255,255,255,.72)}
+.you .ts{font-size:10.5px;color:rgba(255,255,255,.72)}
+.you .txt{font-size:14.5px}
+.thinking{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;flex:none;
+  animation:rise .4s ease-out}
+.thinking .dots{display:flex;gap:4px}
+.thinking .dots i{width:6px;height:6px;border-radius:50%;background:var(--violet);display:block;
+  animation:bob 1.1s ease-in-out infinite}
+.thinking .dots i:nth-child(2){animation-delay:.15s}
+.thinking .dots i:nth-child(3){animation-delay:.3s}
+@keyframes bob{50%{transform:translateY(-4px);opacity:.6}}
+.emptyhint{margin:auto;text-align:center;color:var(--muted);font-size:13.5px;max-width:40ch;padding:30px 0}
+.emptyhint b{display:block;font-size:15px;color:var(--ink2);margin-bottom:6px;font-family:'Plus Jakarta Sans'}
+
+.cfoot{padding:8px 20px 16px;flex:none}
+.inputbar{background:#fff;border:1px solid var(--line);border-radius:999px;height:47px;
+  display:flex;align-items:center;padding:0 6px 0 20px;box-shadow:0 2px 8px rgba(20,23,40,.05);gap:10px}
+.inputbar .ph{color:#9aa0b4;font-size:13.5px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.send{width:35px;height:35px;border-radius:50%;background:var(--indigo);display:grid;
+  place-items:center;flex:none}
+
+/* context panel */
+.ctx{background:#fff;border-left:1px solid var(--line);padding:16px;overflow-y:auto}
+.ctxh{font-family:'Plus Jakarta Sans';font-weight:700;font-size:13px;padding-bottom:12px;
+  border-bottom:1px solid var(--line);margin-bottom:14px}
+.sec{padding-bottom:15px;margin-bottom:15px;border-bottom:1px solid var(--line)}
+.sec:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+.sech{display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.sech b{font-size:10px;font-weight:700;letter-spacing:.08em}
+.cnt2{margin-left:auto;background:var(--indigo-l);color:var(--indigo-d);border-radius:999px;
+  padding:1px 8px;font-size:10px;font-weight:600}
+.car{color:#9aa0b4;font-size:8px}
+.sub2{color:var(--muted);font-size:10.5px;margin:-4px 0 9px}
+.prow{background:var(--wash);border:1px solid var(--line);border-radius:7px;padding:7px 10px;
+  font-size:11.5px;color:var(--ink2);margin-bottom:6px}
+.tool{display:inline-flex;align-items:center;gap:6px;background:var(--indigo-l);border:1px solid #d5daf9;
+  border-radius:999px;padding:4px 11px;font-family:'JetBrains Mono',monospace;font-size:10.5px;
+  color:var(--indigo-d);margin-bottom:6px}
+.tdesc{color:var(--muted);font-size:10.5px}
+.link{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.link .li{color:#9aa0b4;flex:none}
+.link .lt{min-width:0;flex:1}
+.link b{display:block;font-size:11.5px;font-family:Inter;font-weight:600;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.link span{color:var(--muted);font-size:10.5px;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;display:block}
+.openb{border:1px solid #c9cef1;color:var(--indigo);border-radius:7px;padding:3px 10px;
+  font-size:10.5px;font-weight:600;flex:none;background:#fff}
+
+@media(max-width:1180px){.shell{grid-template-columns:52px 1fr}.ctx{display:none}}
+@media(max-width:880px){
+  .shell{grid-template-columns:1fr}.irail{display:none}
+  .scope4{grid-template-columns:1fr 1fr}
+  .cols2{grid-template-columns:1fr;gap:16px}
+  .drawer.open{max-height:1100px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
+  .dinner{opacity:1;transform:none}}
+:focus-visible{outline:2px solid var(--indigo);outline-offset:2px;border-radius:8px}
+</style>
+</head>
+<body>
+
+<div class="demo">
+  <b>DEMO</b>
+  <button data-r="0" aria-pressed="true"><span class="d" style="background:#f59e0b"></span>Ops Users EMEA</button>
+  <button data-r="1" aria-pressed="false"><span class="d" style="background:#8b5cf6"></span>KYC Data</button>
+  <button data-r="2" aria-pressed="false"><span class="d" style="background:#10b981"></span>Renewals</button>
+  <button class="rs" id="reset">Reopen room</button>
+</div>
+
+<nav class="nav">
+  <div class="burger"><i></i><i></i><i></i></div>
+  <div class="mark"></div><div class="brand">Nexar</div>
+  <div class="genie"><span class="lv"></span>Powered by Databricks Genie</div>
+  <div class="beta">BETA</div>
+</nav>
+
+<div class="shell">
+  <div class="irail">
+    <div class="ic acc"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+    <div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+    <div class="sep"></div>
+    <div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+    <div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg></div>
+    <div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M16.5 6.5H10a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6H7"/></svg></div>
+    <div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 11a8 8 0 1 0-2 6"/><path d="M20 5v6h-6"/></svg></div>
+  </div>
+
+  <div class="chat">
+    <div class="chead">
+      <span class="back">&larr; Back</span>
+      <span class="roomdot"></span>
+      <span class="ctitle" id="ctitle">Ops Users EMEA Room</span>
+      <button class="details" id="detailsBtn" aria-expanded="true">
+        <span class="ico">i</span>Details
+        <svg class="cv" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <button class="newchat">+ New chat</button>
+    </div>
+
+    <div class="drawer open" id="drawer">
+      <div class="dinner">
+        <div class="brief">
+          <div class="bhead">
+            <div class="r">
+              <span class="dot"></span>
+              <h4 id="b-name">Ops Users EMEA Room</h4>
+              <span class="spaceid" id="b-id">ops_users_emea_room</span>
+              <span class="freshpill"><span class="gd"></span><span id="b-fresh">Refreshed 2h ago</span></span>
+            </div>
+            <p class="bpurpose" id="b-purpose"></p>
+          </div>
+
+          <div class="bbody">
+            <div class="scope4" id="b-scope"></div>
+            <div class="cols2">
+              <div class="col ok"><h5><span class="d" style="background:var(--green)"></span>Ask about</h5>
+                <ul id="b-ok"></ul></div>
+              <div class="col no"><h5><span class="d" style="background:var(--grey)"></span>Not in this room</h5>
+                <ul id="b-no"></ul></div>
+            </div>
+            <div class="trylbl">TRY ONE</div>
+            <div class="chips" id="b-try"></div>
+          </div>
+
+          <div class="bfoot">
+            <span id="b-counts"></span><span>·</span>
+            <span>Owned by <b id="b-owner"></b></span><span>·</span>
+            <span id="b-updated"></span>
+            <button class="hide" id="hideBtn">Hide details
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M18 15l-6-6-6 6"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cbody" id="cbody">
+      <div class="emptyhint" id="hint">
+        <b>Ask anything this room covers</b>
+        Pick one of the suggestions above, or type your own question below.
+      </div>
+    </div>
+
+    <div class="cfoot">
+      <div class="inputbar">
+        <span class="ph" id="ph">Message Genie in Ops Users EMEA Room…</span>
+        <span class="send"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M3 20l19-8L3 4l4 8-4 8z"/></svg></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ctx">
+    <div class="ctxh">CONTEXT PANEL</div>
+    <div class="sec">
+      <div class="sech"><b>CERTIFIED PROMPTS</b><span class="cnt2" id="ctx-pc">3</span><span class="car">▾</span></div>
+      <div class="sub2">Click to edit, double click to send</div>
+      <div id="ctx-prompts"></div>
+    </div>
+    <div class="sec">
+      <div class="sech"><b>TOOLS</b><span class="cnt2">1</span><span class="car">▾</span></div>
+      <span class="tool"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>@charts</span>
+      <div class="tdesc">Visualize query results as a chart</div>
+    </div>
+    <div class="sec">
+      <div class="sech"><b>SOURCE LINKS</b><span class="cnt2" id="ctx-sc">2</span><span class="car">▾</span></div>
+      <div id="ctx-links"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ROOMS=[
+{name:'Ops Users EMEA Room',id:'ops_users_emea_room',acc:'#f59e0b',rgb:'245,158,11',
+ purpose:'Day-to-day operations support for the EMEA region — ticket handling, SLA performance and renewal follow-up for accounts served out of London and Frankfurt.',
+ fresh:'Refreshed 2h ago',owner:'Operations Data, EMEA',updated:'Model last updated 12 Aug 2026',
+ scope:[['REGION','EMEA','24 countries'],['PERIOD','FY26 to date','from 1 Apr 2025'],
+        ['GRAIN','Daily','rolled up on request'],['ACCESS','Your permissions','via Unity Catalog']],
+ counts:'12 entities · 28 certified metrics · 64 glossary terms',
+ ok:['SLA breaches, response and resolution times',
+     'Ticket volumes by queue, priority or country',
+     'Renewal rate for EMEA-served accounts',
+     'Why an operational metric moved, with drill-down'],
+ no:['North America or APAC data — use <em>Ops Users NA Room</em>',
+     'Records about a named individual',
+     'Anything before FY25 — not modelled here',
+     'Forecasts of future ticket volume'],
+ try:['How many tickets breached SLA this week?','Renewal rate by segment','Why did response time rise in May?'],
+ prompts:['Top SLA breaches this week','Ticket volume by priority','Accounts pending information'],
+ links:[['ops_tickets_emea','Primary BYOD dataset for oper…'],['renewal_global_dashbo…','Shared renewal metric source']]},
+
+{name:'KYC Data',id:'kyc_data',acc:'#8b5cf6',rgb:'139,92,246',
+ purpose:'Know-your-customer review status and certified compliance reporting. Deliberately the narrowest room in Nexar — the boundary is drawn tight because the data behind it is sensitive.',
+ fresh:'Refreshed 6h ago',owner:'Financial Crime Data',updated:'Model last updated 29 Jul 2026',
+ scope:[['REGION','Global','all jurisdictions'],['PERIOD','Rolling 24 months','by case open date'],
+        ['GRAIN','Review case','never individual'],['ACCESS','Restricted','Compliance group only']],
+ counts:'8 entities · 14 certified metrics · 39 glossary terms',
+ ok:['Overdue review counts by risk band',
+     'Refresh-cycle compliance against policy',
+     'Case ageing and backlog trend',
+     'Volumes by jurisdiction or entity type'],
+ no:['Any named individual or account holder',
+     'Raw identity documents or evidence files',
+     'Underlying risk scores — bands only',
+     'Joins to operational or commercial rooms'],
+ try:['Accounts overdue for review by band','How many EDD cases are open?','Backlog trend this quarter'],
+ prompts:['Overdue reviews by risk band','EDD case ageing','Refresh compliance rate'],
+ links:[['kyc_case_registry','Certified case-level registry'],['risk_band_reference','Band definitions and policy…']]},
+
+{name:'Renewals',id:'renewals',acc:'#10b981',rgb:'16,185,129',
+ purpose:'Renewal processing, caseflow and commercial tracking. Shares its certified renewal metric with the operations rooms, which is why two decks stop disagreeing about the number.',
+ fresh:'Refreshed 1h ago',owner:'Commercial Data',updated:'Model last updated 3 Sep 2026',
+ scope:[['REGION','Global','segmented by market'],['PERIOD','FY24 onward','three full years'],
+        ['GRAIN','Contract','and caseflow stage'],['ACCESS','Your permissions','via Unity Catalog']],
+ counts:'15 entities · 31 certified metrics · 52 glossary terms',
+ ok:['Renewal rate by segment, product or market',
+     'Caseflow stage, ageing and descope volumes',
+     'Pending-information and COLT comment counts',
+     'Why renewal rate moved, with drill-down'],
+ no:['Pre-sale pipeline — lives in <em>New Business</em>',
+     'Records about a named individual',
+     'Renewal forecasts — no certified model yet',
+     'Cross-room joins in a single question'],
+ try:['Renewal rate by segment this quarter','Cases pending information','Potential descope this month'],
+ prompts:['Renewal rate by segment','Caseflow stage ageing','Potential descope volume'],
+ links:[['renewal_global_dashbo…','Primary BYOD dataset for ren…'],['colt_launchpad','COLT comment and case source']]}];
+
+let cur=0;
+const $=id=>document.getElementById(id);
+const drawer=$('drawer'),btn=$('detailsBtn'),cbody=$('cbody');
+
+function setOpen(v){
+  drawer.classList.toggle('open',v);
+  btn.setAttribute('aria-expanded',v);
+}
+btn.onclick=()=>setOpen(btn.getAttribute('aria-expanded')!=='true');
+$('hideBtn').onclick=()=>setOpen(false);
+
+function render(){
+  const r=ROOMS[cur];
+  document.documentElement.style.setProperty('--acc',r.acc);
+  document.documentElement.style.setProperty('--acc-soft',`rgba(${r.rgb},.13)`);
+  document.documentElement.style.setProperty('--acc-line',`rgba(${r.rgb},.34)`);
+
+  $('ctitle').textContent=r.name;
+  $('b-name').textContent=r.name;
+  $('b-id').textContent=r.id;
+  $('b-fresh').textContent=r.fresh;
+  $('b-purpose').textContent=r.purpose;
+  $('b-owner').textContent=r.owner;
+  $('b-updated').textContent=r.updated;
+  $('b-counts').textContent=r.counts;
+  $('ph').textContent=`Message Genie in ${r.name}…`;
+
+  $('b-scope').innerHTML=r.scope.map(([k,v,s])=>
+    `<div class="sc"><div class="k">${k}</div><div class="v">${v}<small>${s}</small></div></div>`).join('');
+  $('b-ok').innerHTML=r.ok.map(t=>`<li>${t}</li>`).join('');
+  $('b-no').innerHTML=r.no.map(t=>`<li>${t}</li>`).join('');
+  $('b-try').innerHTML=r.try.map(t=>`<button class="chip">${t}</button>`).join('');
+  $('b-try').querySelectorAll('.chip').forEach(c=>c.onclick=()=>ask(c.textContent));
+
+  $('ctx-prompts').innerHTML=r.prompts.map(p=>`<div class="prow">${p}</div>`).join('');
+  $('ctx-pc').textContent=r.prompts.length;
+  $('ctx-links').innerHTML=r.links.map(([n,d])=>
+    `<div class="link"><span class="li"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></span>
+     <span class="lt"><b>${n}</b><span>${d}</span></span><button class="openb">Open</button></div>`).join('');
+  $('ctx-sc').textContent=r.links.length;
+}
+
+function ask(text){
+  setOpen(false);
+  const h=$('hint'); if(h) h.remove();
+  const t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  const m=document.createElement('div');
+  m.className='you';
+  m.innerHTML=`<div class="meta"><span class="who">YOU</span><span class="ts">${t}</span></div>
+               <div class="txt">${text}</div>`;
+  cbody.appendChild(m);
+  const th=document.createElement('div');
+  th.className='thinking';
+  th.innerHTML=`<span class="dots"><i></i><i></i><i></i></span>Nexar is resolving your question…`;
+  cbody.appendChild(th);
+  cbody.scrollTop=cbody.scrollHeight;
+}
+
+function openRoom(){
+  cbody.innerHTML=`<div class="emptyhint" id="hint"><b>Ask anything this room covers</b>
+    Pick one of the suggestions above, or type your own question below.</div>`;
+  setOpen(false);
+  render();
+  requestAnimationFrame(()=>setTimeout(()=>setOpen(true),120));
+}
+$('reset').onclick=openRoom;
+
+document.querySelectorAll('.demo button[data-r]').forEach(b=>b.onclick=()=>{
+  cur=+b.dataset.r;
+  document.querySelectorAll('.demo button[data-r]').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  openRoom();
+});
+
+render();
+</script>
+</body>
+</html>

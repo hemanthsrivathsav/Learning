@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexar Spaces — redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#171334;
+  --ink-2:#2A2358;
+  --violet:#5546E8;
+  --violet-dark:#4034C4;
+  --violet-tint:#EFECFE;
+  --canvas:#F6F5FB;
+  --surface:#FFFFFF;
+  --border:#E5E2F1;
+  --border-strong:#CFC9E8;
+  --muted:#6C6790;
+  --green:#159A62;
+  --amber:#C77B12;
+  --grey:#9E9AB5;
+  --radius:10px;
+  --shadow-card:0 1px 2px rgba(23,19,52,.06);
+  --shadow-lift:0 6px 20px rgba(23,19,52,.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--canvas);
+  color:var(--ink);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--violet);outline-offset:2px;border-radius:4px}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  display:flex;align-items:center;gap:16px;
+  height:56px;padding:0 20px;
+  background:linear-gradient(90deg,#171334 0%,#241C5A 55%,#33279C 100%);
+  color:#fff;
+}
+.brand{display:flex;align-items:center;gap:9px;font-family:"Plus Jakarta Sans",Inter,sans-serif;font-weight:800;font-size:17px;letter-spacing:-.01em}
+.brand .mark{width:19px;height:19px;border-radius:50%;background:#F5A524;display:grid;place-items:center}
+.brand .mark i{width:7px;height:7px;border-radius:50%;background:var(--ink);display:block}
+.rail-toggle{background:none;border:0;color:#fff;opacity:.75;cursor:pointer;padding:6px;display:none}
+
+.topbar-right{display:flex;align-items:center;gap:12px;margin-left:auto}
+.beta{font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2)}
+
+/* in-page search + toolbar */
+.toolbar{display:flex;align-items:center;gap:10px;margin:0 0 24px}
+.searchbox{position:relative;flex:1;max-width:520px}
+.searchbox svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.searchbox input{
+  width:100%;height:40px;padding:0 66px 0 37px;
+  background:var(--surface);border:1px solid var(--border-strong);border-radius:9px;
+  box-shadow:var(--shadow-card);
+}
+.searchbox input::placeholder{color:var(--muted)}
+.searchbox input:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(85,70,232,.14)}
+.searchbox kbd{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted);
+  padding:2px 6px;border-radius:4px;background:var(--canvas);border:1px solid var(--border);
+}
+.genie{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.72)}
+.genie i{width:6px;height:6px;border-radius:50%;background:#7BE0B4}
+.btn-new{
+  display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 14px;
+  background:#fff;color:var(--violet-dark);border:0;border-radius:8px;
+  font-weight:600;cursor:pointer;white-space:nowrap;
+}
+.btn-new:hover{background:#F0EEFF}
+
+/* ---------- shell ---------- */
+.shell{display:grid;grid-template-columns:216px minmax(0,1fr);max-width:1400px;margin:0 auto;align-items:start}
+
+/* ---------- sidebar ---------- */
+.rail{position:sticky;top:56px;padding:22px 12px 40px;height:calc(100vh - 56px);overflow:auto;border-right:1px solid var(--border)}
+.rail-group{margin-bottom:22px}
+.rail-title{font-size:11.5px;font-weight:600;color:var(--muted);padding:0 10px;margin-bottom:6px}
+.rail-item{
+  display:flex;align-items:center;gap:9px;width:100%;
+  padding:7px 10px;border:0;background:none;border-radius:7px;
+  cursor:pointer;text-align:left;color:var(--ink);
+}
+.rail-item:hover{background:#EDEAF8}
+.rail-item[aria-current="true"]{background:var(--violet-tint);color:var(--violet-dark);font-weight:600}
+.rail-item .count{margin-left:auto;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rail-item[aria-current="true"] .count{color:var(--violet-dark)}
+.rail-item svg{flex:none;opacity:.8}
+.rail hr{border:0;border-top:1px solid var(--border);margin:18px 6px}
+.rail-help{
+  width:100%;text-align:left;padding:11px 12px;border:1px dashed var(--border-strong);
+  background:none;border-radius:9px;cursor:pointer;color:var(--muted);font-size:12.5px;line-height:1.45;
+}
+.rail-help b{display:block;color:var(--ink);font-size:13px;font-weight:600;margin-bottom:2px}
+.rail-help:hover{border-color:var(--violet);color:var(--ink)}
+
+/* ---------- main ---------- */
+main{padding:26px 28px 72px;min-width:0}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:22px}
+.page-head h1{font-family:"Plus Jakarta Sans",Inter,sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em;margin:0 0 3px}
+.page-head p{margin:0;color:var(--muted);max-width:62ch}
+
+/* recent strip */
+.section-label{display:flex;align-items:center;gap:10px;margin:0 0 11px;font-size:13px;font-weight:600}
+.section-label span{color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
+.section-label .tools{margin-left:auto;display:flex;gap:8px;align-items:center}
+.select{
+  height:30px;border:1px solid var(--border);background:var(--surface);
+  border-radius:7px;padding:0 8px;color:var(--ink);cursor:pointer;font-size:13px;
+}
+.recents{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-bottom:30px}
+.recent{
+  display:block;padding:13px 15px;background:var(--surface);
+  border:1px solid var(--border);border-left:3px solid var(--violet);
+  border-radius:var(--radius);box-shadow:var(--shadow-card);cursor:pointer;text-align:left;width:100%;
+}
+.recent:hover{box-shadow:var(--shadow-lift);border-color:var(--border-strong);border-left-color:var(--violet)}
+.recent b{font-size:14px;font-weight:600}
+.recent .last{color:var(--muted);font-size:12.5px;margin-top:3px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.recent .when{color:var(--muted);font-size:11.5px;margin-top:7px}
+
+/* favourites */
+.fav-head{display:flex;align-items:center;gap:8px;margin:0 0 11px;font-size:13px;font-weight:600}
+.fav-head svg{color:var(--violet)}
+.fav-head span{color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
+.favs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-bottom:30px}
+.fav{
+  display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+  padding:11px 13px;background:var(--violet-tint);border:1px solid #DDD7FB;
+  border-radius:9px;cursor:pointer;
+}
+.fav:hover{background:#E6E1FD;border-color:var(--violet)}
+.fav .dot{margin-top:1px}
+.fav b{font-size:13.5px;font-weight:600;display:block}
+.fav .slug{background:none;padding:0;font-size:11px;opacity:.85}
+.fav .unpin{margin-left:auto;background:none;border:0;padding:3px;color:var(--violet-dark);cursor:pointer;border-radius:5px;flex:none}
+.fav .unpin:hover{background:#D9D2FB}
+.fav-empty{
+  grid-column:1/-1;padding:14px;border:1px dashed var(--border-strong);border-radius:9px;
+  color:var(--muted);font-size:12.5px;
+}
+
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:14px}
+.card{
+  position:relative;display:flex;flex-direction:column;
+  padding:15px 16px 13px;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow-card);cursor:pointer;text-align:left;
+}
+.card:hover{box-shadow:var(--shadow-lift);border-color:var(--border-strong)}
+.card-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.dot{width:7px;height:7px;border-radius:50%;flex:none}
+.dot.active{background:var(--green)}
+.dot.draft{background:var(--amber)}
+.dot.paused{background:var(--grey)}
+.card h3{margin:0;font-size:14.5px;font-weight:600;letter-spacing:-.01em}
+.state{
+  font-size:11px;padding:1px 7px;border-radius:20px;font-weight:500;
+  background:#F3F1FA;color:var(--muted);
+}
+.pin{
+  margin-left:auto;background:none;border:0;padding:3px;border-radius:5px;
+  cursor:pointer;color:var(--grey);opacity:0;flex:none;
+}
+.card:hover .pin,.pin:focus-visible,.pin[aria-pressed="true"]{opacity:1}
+.pin[aria-pressed="true"]{color:var(--violet)}
+.card p{margin:0 0 12px;color:var(--muted);font-size:13px;min-height:38px}
+.meta{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted);margin-bottom:11px}
+.meta b{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+.card-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:10px;border-top:1px solid var(--border)}
+.slug{
+  font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--violet-dark);
+  background:var(--violet-tint);padding:2px 7px;border-radius:5px;
+}
+.open{font-size:12.5px;font-weight:600;color:var(--violet-dark);opacity:0}
+.card:hover .open,.card:focus-visible .open{opacity:1}
+
+/* create tile */
+.tile-new{
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;
+  padding:18px;background:none;border:1.5px dashed var(--border-strong);
+  border-radius:var(--radius);cursor:pointer;text-align:left;min-height:158px;color:var(--ink);
+}
+.tile-new:hover{border-color:var(--violet);background:#FAF9FE}
+.tile-new .plus{
+  width:30px;height:30px;border-radius:8px;background:var(--violet-tint);
+  color:var(--violet-dark);display:grid;place-items:center;margin-bottom:4px;font-size:18px;line-height:1;
+}
+.tile-new b{font-size:14px;font-weight:600}
+.tile-new span{color:var(--muted);font-size:12.5px}
+
+.empty{padding:52px 20px;text-align:center;color:var(--muted);border:1px dashed var(--border-strong);border-radius:var(--radius)}
+.empty b{display:block;color:var(--ink);font-size:15px;margin-bottom:4px}
+.empty button{margin-top:14px}
+
+/* ---------- modal ---------- */
+.scrim{position:fixed;inset:0;background:rgba(23,19,52,.42);display:none;z-index:60}
+.scrim[open]{display:grid;place-items:center;padding:20px}
+.modal{
+  width:min(520px,100%);background:var(--surface);border-radius:14px;
+  box-shadow:0 24px 60px rgba(23,19,52,.28);padding:24px;max-height:90vh;overflow:auto;
+}
+.modal h2{font-family:"Plus Jakarta Sans",Inter,sans-serif;font-size:19px;font-weight:800;margin:0 0 4px;letter-spacing:-.01em}
+.modal .sub{color:var(--muted);margin:0 0 20px}
+.field{margin-bottom:15px}
+.field label{display:block;font-size:12.5px;font-weight:600;margin-bottom:5px}
+.field input,.field textarea,.field select{
+  width:100%;padding:9px 11px;border:1px solid var(--border-strong);
+  border-radius:8px;background:var(--surface);
+}
+.field textarea{resize:vertical;min-height:64px}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(85,70,232,.14)}
+.hint{font-size:12px;color:var(--muted);margin-top:5px}
+.hint code{font-family:"JetBrains Mono",monospace;color:var(--violet-dark)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-foot{display:flex;justify-content:flex-end;gap:9px;margin-top:22px}
+.btn{height:36px;padding:0 16px;border-radius:8px;font-weight:600;cursor:pointer;border:1px solid transparent}
+.btn-ghost{background:none;border-color:var(--border-strong)}
+.btn-ghost:hover{background:#F1EFF9}
+.btn-primary{background:var(--violet);color:#fff}
+.btn-primary:hover{background:var(--violet-dark)}
+
+/* how it works */
+.steps{display:grid;gap:14px;margin:4px 0 0}
+.step{display:flex;gap:12px}
+.step .n{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--violet);color:var(--violet-dark);display:grid;place-items:center;font-size:12px;font-weight:600;flex:none}
+.step b{display:block;font-size:13.5px;margin-bottom:1px}
+.step p{margin:0;color:var(--muted);font-size:13px}
+
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(12px);
+  background:var(--ink);color:#fff;padding:10px 16px;border-radius:9px;font-size:13px;
+  opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;z-index:70;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .rail{position:static;height:auto;border-right:0;border-bottom:1px solid var(--border);display:flex;gap:8px;overflow-x:auto;padding:12px}
+  .rail-group{margin:0;display:flex;gap:6px}
+  .rail-title,.rail hr,.rail-help{display:none}
+  .rail-item{width:auto;white-space:nowrap;border:1px solid var(--border);background:var(--surface)}
+  .searchbox kbd{display:none}
+  .toolbar{flex-wrap:wrap}
+  .searchbox{max-width:none;flex:1 1 100%}
+  .genie{display:none}
+  main{padding:20px 16px 60px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button class="rail-toggle" aria-label="Menu">☰</button>
+  <div class="brand"><span class="mark"><i></i></span>Nexar</div>
+
+  <div class="topbar-right">
+    <div class="genie"><i></i>Powered by Databricks Genie</div>
+    <span class="beta">Beta</span>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" aria-label="Space categories">
+    <div class="rail-group">
+      <div class="rail-title">Browse</div>
+      <button class="rail-item" data-filter="all" aria-current="true">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        All spaces <span class="count" data-count="all"></span>
+      </button>
+      <button class="rail-item" data-filter="pinned">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17v5M9 3h6l-1 7 3 3H7l3-3-1-7z"/></svg>
+        Pinned <span class="count" data-count="pinned"></span>
+      </button>
+      <button class="rail-item" data-filter="mine">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.6 3.1-5.5 7-5.5s7 1.9 7 5.5"/></svg>
+        Created by me <span class="count" data-count="mine"></span>
+      </button>
+    </div>
+
+    <hr>
+
+    <div class="rail-group" id="catGroup">
+      <div class="rail-title">Categories</div>
+    </div>
+
+    <hr>
+
+    <button class="rail-help" id="openHelp">
+      <b>How Nexar works</b>
+      Pick a space, ask in plain language, explore the traced result.
+    </button>
+  </nav>
+
+  <main>
+    <div class="page-head">
+      <div>
+        <h1>Spaces</h1>
+        <p>Each space is a governed semantic context — entities, metrics and glossary preloaded — so the same question gets the same answer every time.</p>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="searchbox">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="search" type="search" placeholder="Search spaces, slugs or descriptions" aria-label="Search spaces">
+        <kbd>/</kbd>
+      </div>
+      <button class="btn btn-primary" id="openNew" style="display:inline-flex;align-items:center;gap:7px;height:40px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+        New space
+      </button>
+    </div>
+
+    <div id="favWrap">
+      <h2 class="fav-head">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6"><path d="M12 17v5M9 3h6l-1 7 3 3H7l3-3-1-7z"/></svg>
+        Pinned <span id="favCount"></span>
+      </h2>
+      <div class="favs" id="favs"></div>
+    </div>
+
+    <div id="recentWrap">
+      <h2 class="section-label">Jump back in</h2>
+      <div class="recents" id="recents"></div>
+    </div>
+
+    <h2 class="section-label">
+      <span id="resultsLabel">All spaces</span>
+      <span id="resultsCount"></span>
+      <div class="tools">
+        <select class="select" id="sort" aria-label="Sort spaces">
+          <option value="recent">Recently used</option>
+          <option value="name">Name A–Z</option>
+          <option value="active">Most active</option>
+        </select>
+      </div>
+    </h2>
+
+    <div class="grid" id="grid"></div>
+  </main>
+</div>
+
+<!-- create space -->
+<div class="scrim" id="newScrim" role="dialog" aria-modal="true" aria-labelledby="newTitle">
+  <div class="modal">
+    <h2 id="newTitle">Create a space</h2>
+    <p class="sub">Name it for the team that will use it. You can connect the Genie room now or later.</p>
+
+    <div class="field">
+      <label for="f-name">Space name</label>
+      <input id="f-name" placeholder="e.g. Claims Operations APAC" autocomplete="off">
+      <div class="hint">Slug: <code id="slugPreview">—</code></div>
+    </div>
+
+    <div class="field">
+      <label for="f-desc">What is it for</label>
+      <textarea id="f-desc" placeholder="One line your team will recognise in the grid."></textarea>
+    </div>
+
+    <div class="two">
+      <div class="field">
+        <label for="f-cat">Category</label>
+        <select id="f-cat">
+          <option>Operations</option><option>Markets</option><option>Data</option>
+          <option>Renewals</option><option>Testing</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-genie">Genie room ID</label>
+        <input id="f-genie" placeholder="Optional" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close>Cancel</button>
+      <button class="btn btn-primary" id="createBtn">Create space</button>
+    </div>
+  </div>
+</div>
+
+<!-- how it works -->
+<div class="scrim" id="helpScrim" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="modal">
+    <h2 id="helpTitle">How Nexar works</h2>
+    <p class="sub">Three steps, every time.</p>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><div><b>Choose a space</b><p>A governed semantic context with entities, metrics and glossary already loaded.</p></div></div>
+      <div class="step"><div class="n">2</div><div><b>Ask in plain language</b><p>Nexar reads intent, resolves synonyms and applies your business rules automatically.</p></div></div>
+      <div class="step"><div class="n">3</div><div><b>Explore results</b><p>Answers arrive with confidence scores, mapping traces and full explainability.</p></div></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-primary" data-close>Got it</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const spaces = [
+  {name:"Ops Users EMEA Room", slug:"ops_users_emea_room", cat:"Operations", desc:"Operations support across the EMEA region.", state:"active", prompts:24, dashboards:3, used:2, mine:true, pinned:true, last:"Open incidents by severity this week"},
+  {name:"Ops Users NA Room", slug:"ops_users_na_room", cat:"Operations", desc:"North America ops support and triage.", state:"active", prompts:19, dashboards:2, used:5, mine:false, pinned:false, last:"Triage backlog vs last month"},
+  {name:"ZEN Renewals", slug:"zen_renewals", cat:"Renewals", desc:"Renewal queries for the ZEN portfolio.", state:"active", prompts:31, dashboards:4, used:26, mine:true, pinned:true, last:"Renewal rate by broker, Q3"},
+  {name:"Markets", slug:"markets", cat:"Markets", desc:"Market search and chat workflows.", state:"active", prompts:16, dashboards:5, used:9, mine:false, pinned:false, last:"Premium movement by market segment"},
+  {name:"KYC Data", slug:"kyc_data", cat:"Data", desc:"KYC data Q&A and certified prompts.", state:"active", prompts:42, dashboards:1, used:31, mine:false, pinned:false, last:"Verification gaps by onboarding batch"},
+  {name:"New Business", slug:"new_business", cat:"Operations", desc:"New business onboarding workflows.", state:"active", prompts:12, dashboards:2, used:52, mine:true, pinned:false, last:"Quote-to-bind conversion, August"},
+  {name:"Quality Control", slug:"quality_control", cat:"Operations", desc:"QC checks, exceptions and review workflows.", state:"draft", prompts:6, dashboards:0, used:74, mine:true, pinned:false, last:"Exception volume by reviewer"},
+  {name:"Renewals", slug:"renewals", cat:"Renewals", desc:"Renewal processing and tracking.", state:"active", prompts:22, dashboards:3, used:120, mine:false, pinned:false, last:"Lapse risk in the next 30 days"},
+  {name:"PO Testing", slug:"po_testing", cat:"Testing", desc:"Product owner testing environment.", state:"paused", prompts:3, dashboards:0, used:210, mine:true, pinned:false, last:"Sandbox check on intent mapping"},
+  {name:"SMB", slug:"smb", cat:"Markets", desc:"Small and mid-market book analysis.", state:"active", prompts:14, dashboards:2, used:47, mine:false, pinned:false, last:"SMB retention by region"},
+  {name:"Cube Integration Test Room", slug:"cube_integration_test", cat:"Testing", desc:"Semantic cube integration checks.", state:"paused", prompts:2, dashboards:0, used:340, mine:false, pinned:false, last:"Cube sync validation run"},
+  {name:"Claims Analytics", slug:"claims_analytics", cat:"Data", desc:"Claims frequency, severity and reserve views.", state:"active", prompts:28, dashboards:6, used:14, mine:false, pinned:false, last:"Severity trend by cause of loss"}
+];
+
+const CATS = ["Operations","Markets","Data","Renewals","Testing"];
+let filter = "all", query = "", sort = "recent";
+
+const grid = document.getElementById('grid');
+const recents = document.getElementById('recents');
+const toastEl = document.getElementById('toast');
+
+function ago(m){
+  if(m < 60) return m + " min ago";
+  if(m < 1440) return Math.round(m/60) + " h ago";
+  return Math.round(m/1440) + " d ago";
+}
+function slugify(s){return s.toLowerCase().trim().replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"")}
+function toast(msg){toastEl.textContent = msg;toastEl.classList.add('show');clearTimeout(toastEl.t);toastEl.t=setTimeout(()=>toastEl.classList.remove('show'),2400)}
+
+/* sidebar categories */
+const catGroup = document.getElementById('catGroup');
+CATS.forEach(c=>{
+  const b = document.createElement('button');
+  b.className = 'rail-item'; b.dataset.filter = c;
+  b.innerHTML = c + ' <span class="count"></span>';
+  catGroup.appendChild(b);
+});
+
+document.querySelectorAll('.rail-item').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.rail-item').forEach(x=>x.setAttribute('aria-current','false'));
+    b.setAttribute('aria-current','true');
+    filter = b.dataset.filter;
+    render();
+  });
+});
+
+function match(s){
+  const q = query.toLowerCase();
+  const hitQ = !q || s.name.toLowerCase().includes(q) || s.slug.includes(q) || s.desc.toLowerCase().includes(q);
+  let hitF = true;
+  if(filter === 'pinned') hitF = s.pinned;
+  else if(filter === 'mine') hitF = s.mine;
+  else if(filter !== 'all') hitF = s.cat === filter;
+  return hitQ && hitF;
+}
+
+function card(s){
+  const el = document.createElement('div');
+  el.className = 'card'; el.tabIndex = 0; el.setAttribute('role','link');
+  el.innerHTML = `
+    <div class="card-top">
+      <span class="dot ${s.state}"></span>
+      <h3>${s.name}</h3>
+      ${s.state !== 'active' ? `<span class="state">${s.state === 'draft' ? 'Draft' : 'Paused'}</span>` : ''}
+      <button class="pin" aria-pressed="${s.pinned}" aria-label="Pin ${s.name}" title="Pin to the top">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="${s.pinned?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M12 17v5M9 3h6l-1 7 3 3H7l3-3-1-7z"/></svg>
+      </button>
+    </div>
+    <p>${s.desc}</p>
+    <div class="meta"><span><b>${s.prompts}</b> certified prompts</span><span><b>${s.dashboards}</b> dashboards</span></div>
+    <div class="card-foot"><span class="slug">${s.slug}</span><span class="open">Open space</span></div>`;
+  el.querySelector('.pin').addEventListener('click',e=>{
+    e.stopPropagation(); s.pinned = !s.pinned;
+    toast(s.pinned ? `${s.name} pinned` : `${s.name} unpinned`); render();
+  });
+  const open = ()=> toast(`Opening ${s.name}`);
+  el.addEventListener('click',open);
+  el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}});
+  return el;
+}
+
+function render(){
+  // counts
+  document.querySelector('[data-count="all"]').textContent = spaces.length;
+  document.querySelector('[data-count="pinned"]').textContent = spaces.filter(s=>s.pinned).length;
+  document.querySelector('[data-count="mine"]').textContent = spaces.filter(s=>s.mine).length;
+  CATS.forEach(c=>{
+    const n = document.querySelector(`.rail-item[data-filter="${c}"] .count`);
+    if(n) n.textContent = spaces.filter(s=>s.cat===c).length;
+  });
+
+  // pinned strip on the default view
+  const showRecents = filter === 'all' && !query;
+  document.getElementById('favWrap').style.display = showRecents ? '' : 'none';
+  if(showRecents){
+    const pins = spaces.filter(s=>s.pinned);
+    document.getElementById('favCount').textContent = pins.length ? pins.length : '';
+    const favs = document.getElementById('favs');
+    favs.innerHTML = '';
+    if(!pins.length){
+      favs.innerHTML = '<div class="fav-empty">Nothing pinned yet. Hover any space below and use the pin to keep it here.</div>';
+    }
+    pins.forEach(s=>{
+      const f = document.createElement('button');
+      f.className = 'fav';
+      f.innerHTML = `<span class="dot ${s.state}"></span>
+        <span><b>${s.name}</b><span class="slug">${s.slug}</span></span>
+        <span class="unpin" role="button" tabindex="0" aria-label="Unpin ${s.name}" title="Unpin">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6"><path d="M12 17v5M9 3h6l-1 7 3 3H7l3-3-1-7z"/></svg>
+        </span>`;
+      f.querySelector('.unpin').addEventListener('click',e=>{
+        e.stopPropagation(); s.pinned = false; toast(`${s.name} unpinned`); render();
+      });
+      f.addEventListener('click',()=>toast(`Opening ${s.name}`));
+      favs.appendChild(f);
+    });
+  }
+
+  document.getElementById('recentWrap').style.display = showRecents ? '' : 'none';
+  if(showRecents){
+    recents.innerHTML = '';
+    [...spaces].sort((a,b)=>a.used-b.used).slice(0,3).forEach(s=>{
+      const r = document.createElement('button');
+      r.className = 'recent';
+      r.innerHTML = `<b>${s.name}</b><div class="last">${s.last}</div><div class="when">${ago(s.used)}</div>`;
+      r.addEventListener('click',()=>toast(`Opening ${s.name}`));
+      recents.appendChild(r);
+    });
+  }
+
+  let list = spaces.filter(match);
+  if(sort === 'name') list.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(sort === 'active') list.sort((a,b)=>b.prompts-a.prompts);
+  else list.sort((a,b)=>a.used-b.used);
+  list.sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0));
+
+  document.getElementById('resultsLabel').textContent =
+    query ? `Results for “${query}”` : filter === 'all' ? 'All spaces' : filter === 'mine' ? 'Created by me' : filter === 'pinned' ? 'Pinned' : filter;
+  document.getElementById('resultsCount').textContent = list.length + (list.length === 1 ? ' space' : ' spaces');
+
+  grid.innerHTML = '';
+  if(!list.length){
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><b>No space matches that</b>Try a different term, or set one up for this work.<br><button class="btn btn-primary" onclick="document.getElementById('openNew').click()">Create a space</button></div>`;
+    return;
+  }
+  if(!query){
+    const t = document.createElement('button');
+    t.className = 'tile-new';
+    t.innerHTML = `<span class="plus">+</span><b>Create a space</b><span>Name it, connect a Genie room, invite your team.</span>`;
+    t.addEventListener('click',()=>openModal('newScrim'));
+    grid.appendChild(t);
+  }
+  list.forEach(s=>grid.appendChild(card(s)));
+}
+
+/* search */
+const search = document.getElementById('search');
+search.addEventListener('input',e=>{query = e.target.value.trim(); render()});
+document.addEventListener('keydown',e=>{
+  if(e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA'){
+    e.preventDefault(); search.focus();
+  }
+  if(e.key === 'Escape'){ document.querySelectorAll('.scrim[open]').forEach(s=>s.removeAttribute('open')); }
+});
+document.getElementById('sort').addEventListener('change',e=>{sort = e.target.value; render()});
+
+/* modals */
+function openModal(id){
+  const s = document.getElementById(id);
+  s.setAttribute('open','');
+  const f = s.querySelector('input,button');
+  if(f) f.focus();
+}
+document.getElementById('openNew').addEventListener('click',()=>openModal('newScrim'));
+document.getElementById('openHelp').addEventListener('click',()=>openModal('helpScrim'));
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>b.closest('.scrim').removeAttribute('open')));
+document.querySelectorAll('.scrim').forEach(s=>s.addEventListener('click',e=>{if(e.target === s) s.removeAttribute('open')}));
+
+const fName = document.getElementById('f-name');
+fName.addEventListener('input',()=>{
+  document.getElementById('slugPreview').textContent = fName.value ? slugify(fName.value) : '—';
+});
+document.getElementById('createBtn').addEventListener('click',()=>{
+  const name = fName.value.trim();
+  if(!name){fName.focus();fName.style.borderColor = '#C1442E';return}
+  spaces.unshift({
+    name, slug: slugify(name), cat: document.getElementById('f-cat').value,
+    desc: document.getElementById('f-desc').value.trim() || 'No description yet.',
+    state:'draft', prompts:0, dashboards:0, used:0, mine:true, pinned:false, last:'No questions asked yet'
+  });
+  document.getElementById('newScrim').removeAttribute('open');
+  fName.value = ''; document.getElementById('f-desc').value = ''; document.getElementById('slugPreview').textContent = '—';
+  filter = 'all'; query = ''; search.value = '';
+  document.querySelectorAll('.rail-item').forEach(x=>x.setAttribute('aria-current','false'));
+  document.querySelector('.rail-item[data-filter="all"]').setAttribute('aria-current','true');
+  render();
+  toast(`${name} created`);
+});
+
+render();
+</script>
+</body>
+</html>
